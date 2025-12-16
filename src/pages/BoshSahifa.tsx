@@ -368,8 +368,7 @@ export function BoshSahifa() {
             <div>
               <h4 className="font-bold mb-3 sm:mb-4 text-sm sm:text-base">Bog'lanish</h4>
               <ul className="space-y-2 text-slate-400 text-sm">
-                <li>info@mukammal.uz</li>
-                <li>+998 90 123 45 67</li>
+                <li>+998 88 081 81 88</li>
                 <li>Toshkent</li>
               </ul>
             </div>
