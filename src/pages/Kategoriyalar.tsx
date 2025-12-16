@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { categoriesAPI, sectionsAPI } from '../api';
 
@@ -21,12 +21,11 @@ export function Kategoriyalar() {
   const [searchParams] = useSearchParams();
   const bolimId = searchParams.get('bolim');
   const [categories, setCategories] = useState<Category[]>([]);
-  const [section, setSection] = useState<Section | null>(null);
+  const [, setSection] = useState<Section | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const { user, isAdmin, isSubscribed, subscription } = useAuth();
-  const navigate = useNavigate();
 
   useEffect(() => {
     loadData();

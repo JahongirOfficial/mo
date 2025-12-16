@@ -1,16 +1,46 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export function KirishSahifasi() {
+  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'register') {
+      setActiveTab('register');
+    }
+  }, [searchParams]);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
   const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState('+998 ');
   const [password, setPassword] = useState('');
+
+  // Telefon raqamni formatlash: +998 XX XXX XX XX
+  const formatPhone = (value: string) => {
+    // Faqat raqamlarni olish
+    const numbers = value.replace(/\D/g, '');
+    
+    // +998 dan keyin 9 ta raqam
+    let formatted = '+998 ';
+    if (numbers.length > 3) {
+      const rest = numbers.slice(3, 12); // 998 dan keyingi 9 ta raqam
+      if (rest.length > 0) formatted += rest.slice(0, 2);
+      if (rest.length > 2) formatted += ' ' + rest.slice(2, 5);
+      if (rest.length > 5) formatted += ' ' + rest.slice(5, 7);
+      if (rest.length > 7) formatted += ' ' + rest.slice(7, 9);
+    }
+    return formatted;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhone(e.target.value);
+    setPhone(formatted);
+  };
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const { login, register } = useAuth();
@@ -160,7 +190,7 @@ export function KirishSahifasi() {
                 <input
                   type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={handlePhoneChange}
                   className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:bg-white focus:border-primary outline-none transition-all text-slate-900 font-medium"
                   placeholder="+998 90 123 45 67"
                   required

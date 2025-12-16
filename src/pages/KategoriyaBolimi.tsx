@@ -27,7 +27,7 @@ export function KategoriyaBolimi() {
   const [category, setCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState(true);
   const [accessDenied, setAccessDenied] = useState(false);
-  const [categoryIndex, setCategoryIndex] = useState<number>(-1);
+  const [, setCategoryIndex] = useState<number>(-1);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
 
   useEffect(() => {
