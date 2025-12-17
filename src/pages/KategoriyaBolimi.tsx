@@ -178,9 +178,9 @@ export function KategoriyaBolimi() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
-        {/* Section Hero */}
-        <div className={`bg-gradient-to-br ${colors.gradient} rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-12 mb-6 sm:mb-10 text-white relative overflow-hidden`}>
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-12">
+        {/* Section Hero - Desktop only */}
+        <div className={`hidden sm:block bg-gradient-to-br ${colors.gradient} rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-12 mb-6 sm:mb-10 text-white relative overflow-hidden`}>
           <div className="absolute top-0 right-0 w-40 sm:w-64 h-40 sm:h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="absolute bottom-0 left-0 w-32 sm:w-48 h-32 sm:h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
           
