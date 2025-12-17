@@ -31,14 +31,22 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - Network first, fallback to cache
 self.addEventListener('fetch', (event) => {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  
+  // Skip API requests
+  if (event.request.url.includes('/api/')) {
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Clone the response
         const responseClone = response.clone();
         caches.open(CACHE_NAME)
           .then((cache) => {
-            // Only cache same-origin requests
             if (event.request.url.startsWith(self.location.origin)) {
               cache.put(event.request, responseClone);
             }
