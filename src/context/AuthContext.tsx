@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await authAPI.register(fullName, phone, password);
     localStorage.setItem('token', res.data.token);
     setUser(res.data.user);
-    setSubscription({ isSubscribed: false, subscriptionActive: false, subscriptionEndDate: null, daysLeft: 0 });
+    await refreshSubscription();
   };
 
   const logout = () => {
