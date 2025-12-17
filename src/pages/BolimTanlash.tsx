@@ -38,12 +38,10 @@ export function BolimTanlash() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20">
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-[#30b564] flex items-center justify-center text-white shadow-lg shadow-[#30b564]/20">
-                <span className="material-symbols-outlined text-xl sm:text-2xl lg:text-3xl">family_star</span>
-              </div>
-              <div className="hidden sm:block">
-                <span className="text-lg sm:text-xl font-bold text-slate-900">Mukammal Ota Ona</span>
-                <p className="text-xs text-slate-500">Farzand tarbiyasi</p>
+              <img src="/uploads/logo/gr.png" alt="Logo" className="w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl object-cover" />
+              <div className="flex flex-col leading-tight">
+                <span className="text-[10px] sm:text-xs text-slate-500 font-medium tracking-[0.3em] sm:tracking-[0.35em] lg:tracking-[0.4em] ml-[2px]">mukammal</span>
+                <span className="text-base sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 bg-clip-text text-transparent -mt-1">OTA-ONA</span>
               </div>
             </div>
             
