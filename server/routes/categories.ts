@@ -51,7 +51,7 @@ router.get('/:id', async (req, res) => {
 // Create category (admin only)
 router.post('/', isAdmin, async (req: AuthRequest, res) => {
   try {
-    const { sectionId, name, description, icon, color } = req.body;
+    const { sectionId, name, description, icon, color, orderIndex, status } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: 'Kategoriya nomi kiritilishi shart' });
@@ -62,7 +62,9 @@ router.post('/', isAdmin, async (req: AuthRequest, res) => {
       name,
       description: description || '',
       icon: icon || 'category',
-      color: color || 'green'
+      color: color || 'green',
+      orderIndex: orderIndex || 0,
+      status: status || 'active'
     });
 
     res.json({ ...category.toObject(), id: category._id });
@@ -75,11 +77,11 @@ router.post('/', isAdmin, async (req: AuthRequest, res) => {
 // Update category (admin only)
 router.put('/:id', isAdmin, async (req: AuthRequest, res) => {
   try {
-    const { sectionId, name, description, icon, color } = req.body;
+    const { sectionId, name, description, icon, color, orderIndex, status } = req.body;
 
     const category = await Category.findByIdAndUpdate(
       req.params.id,
-      { sectionId, name, description, icon, color },
+      { sectionId, name, description, icon, color, orderIndex, status },
       { new: true }
     );
 

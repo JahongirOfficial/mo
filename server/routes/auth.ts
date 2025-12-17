@@ -15,7 +15,10 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: "Barcha maydonlarni to'ldiring" });
     }
 
-    const existingUser = await User.findOne({ phone });
+    // Bo'shliqlarni olib tashlash
+    const cleanPhone = phone.replace(/\s/g, '');
+    
+    const existingUser = await User.findOne({ phone: cleanPhone });
     if (existingUser) {
       return res.status(400).json({ error: "Bu telefon raqam allaqachon ro'yxatdan o'tgan" });
     }
@@ -28,7 +31,7 @@ router.post('/register', async (req, res) => {
     
     const user = await User.create({
       fullName,
-      phone,
+      phone: cleanPhone,
       password: hashedPassword,
       subscriptionEnd: trialEndDate,
       usedFreeTrial: true
@@ -59,7 +62,9 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: "Telefon va parolni kiriting" });
     }
 
-    const user = await User.findOne({ phone });
+    // Bo'shliqlarni olib tashlash
+    const cleanPhone = phone.replace(/\s/g, '');
+    const user = await User.findOne({ phone: cleanPhone });
     if (!user) {
       return res.status(400).json({ error: 'Foydalanuvchi topilmadi' });
     }

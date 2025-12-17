@@ -8,6 +8,8 @@ interface Section {
   name: string;
   icon: string;
   color: string;
+  orderIndex: number;
+  status: 'active' | 'pause';
   categoryCount: number;
 }
 
@@ -15,6 +17,8 @@ export function BolimTanlash() {
   const { user, isAdmin, subscription } = useAuth();
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showPauseModal, setShowPauseModal] = useState(false);
+  const [pausedSectionName, setPausedSectionName] = useState('');
 
   useEffect(() => {
     loadSections();
@@ -95,25 +99,63 @@ export function BolimTanlash() {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {sections.map((section) => (
-              <Link
-                key={section.id}
-                to={`/kategoriyalar?bolim=${section.id}`}
-                className="group flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3 sm:py-4 bg-white shadow-sm hover:shadow-md transition-all duration-300 border-y border-slate-100 hover:bg-emerald-50"
-              >
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br ${section.color} flex items-center justify-center text-white shadow`}>
-                  <span className="material-symbols-outlined text-lg sm:text-xl">{section.icon}</span>
-                </div>
-                <div className="flex-1">
-                  <span className="font-semibold text-slate-700 group-hover:text-emerald-600 transition-colors text-sm sm:text-base">{section.name}</span>
-                  <p className="text-xs text-slate-500">{section.categoryCount} ta kategoriya</p>
-                </div>
-                <span className="material-symbols-outlined text-slate-400 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all">chevron_right</span>
-              </Link>
-            ))}
+            {sections.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0)).map((section, index) => {
+              const isPaused = section.status === 'pause' && !isAdmin;
+              const prevSection = sections.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0))[index - 1];
+              
+              const handleClick = (e: React.MouseEvent) => {
+                if (isPaused) {
+                  e.preventDefault();
+                  setPausedSectionName(prevSection?.name || 'oldingi bo\'lim');
+                  setShowPauseModal(true);
+                }
+              };
+              
+              return (
+                <Link
+                  key={section.id}
+                  to={isPaused ? '#' : `/kategoriya/${section.id}`}
+                  onClick={handleClick}
+                  className={`group flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3 sm:py-4 bg-white shadow-sm transition-all duration-300 border-y border-slate-100 ${isPaused ? 'opacity-60' : 'hover:shadow-md hover:bg-emerald-50'}`}
+                >
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br ${section.color} flex items-center justify-center text-white shadow ${isPaused ? 'grayscale' : ''}`}>
+                    <span className="material-symbols-outlined text-lg sm:text-xl">{isPaused ? 'lock' : section.icon}</span>
+                  </div>
+                  <div className="flex-1">
+                    <span className={`font-semibold transition-colors text-sm sm:text-base ${isPaused ? 'text-slate-500' : 'text-slate-700 group-hover:text-emerald-600'}`}>{section.name}</span>
+                    <p className="text-xs text-slate-500">{section.categoryCount} ta kategoriya</p>
+                  </div>
+                  <span className={`material-symbols-outlined transition-all ${isPaused ? 'text-slate-300' : 'text-slate-400 group-hover:text-emerald-500 group-hover:translate-x-1'}`}>
+                    {isPaused ? 'lock' : 'chevron_right'}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         )}
       </main>
+
+      {/* Pause Modal */}
+      {showPauseModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setShowPauseModal(false)} />
+          <div className="relative bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
+            <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-3xl text-amber-600">lock</span>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Bo'lim qulflangan</h3>
+            <p className="text-slate-600 text-sm mb-6">
+              Bu bo'limni ochish uchun avval <strong>"{pausedSectionName}"</strong> bo'limini tugatishingiz kerak.
+            </p>
+            <button
+              onClick={() => setShowPauseModal(false)}
+              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold"
+            >
+              Tushundim
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

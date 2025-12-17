@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 interface Lesson {
   id: string; title: string; content: string; duration: string; type: string;
   categoryId: string; categoryName: string; videoUrl?: string;
+  tushuncha?: string; misol?: string; amaliy?: string;
   prevLesson: { id: string; title: string } | null;
   nextLesson: { id: string; title: string } | null;
 }
@@ -20,6 +21,7 @@ export function DarsSahifasi() {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showShareToast, setShowShareToast] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [openSection, setOpenSection] = useState<string | null>(null);
 
   useEffect(() => { loadLesson(); window.scrollTo(0, 0); }, [id]);
 
@@ -46,7 +48,7 @@ export function DarsSahifasi() {
     if (lesson.nextLesson) {
       navigate(`/dars/${lesson.nextLesson.id}`);
     } else {
-      navigate(`/kategoriya/${lesson.categoryId}`);
+      navigate(`/bolim`);
     }
   };
 
@@ -110,7 +112,7 @@ export function DarsSahifasi() {
       if (err.response?.data?.code === 'SUBSCRIPTION_REQUIRED') {
         setSubscriptionError(true);
       } else {
-        navigate('/kategoriyalar');
+        navigate('/bolim');
       }
     } finally { setLoading(false); }
   };
@@ -131,7 +133,7 @@ export function DarsSahifasi() {
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">Obuna talab qilinadi</h2>
         <p className="text-slate-600 mb-8 text-sm sm:text-base">Darslarni ko'rish uchun oylik obunani faollashtiring. Admin bilan bog'laning.</p>
-        <Link to="/kategoriyalar" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold text-sm">
+        <Link to="/bolim" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold text-sm">
           <span className="material-symbols-outlined">arrow_back</span>Orqaga qaytish
         </Link>
       </div>
@@ -148,7 +150,7 @@ export function DarsSahifasi() {
       <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-14 sm:h-16 lg:h-20 gap-3">
-            <button onClick={() => navigate(`/kategoriya/${lesson.categoryId}`)} className="p-2 hover:bg-slate-100 rounded-xl">
+            <button onClick={() => navigate('/bolim')} className="p-2 hover:bg-slate-100 rounded-xl">
               <span className="material-symbols-outlined text-slate-600">arrow_back</span>
             </button>
             <div className="flex-1 min-w-0">
@@ -196,6 +198,80 @@ export function DarsSahifasi() {
               >
                 Brauzeringiz video formatini qo'llab-quvvatlamaydi.
               </video>
+            </div>
+          )}
+
+          {/* Accordion Sections */}
+          {lesson.type === 'video' && (lesson.tushuncha || lesson.misol || lesson.amaliy) && (
+            <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 space-y-3">
+              {/* Ota-onaga tushuncha */}
+              {lesson.tushuncha && (
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setOpenSection(openSection === 'tushuncha' ? null : 'tushuncha')}
+                    className={`w-full flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 transition-colors ${openSection === 'tushuncha' ? 'bg-emerald-50' : 'bg-slate-50 hover:bg-slate-100'}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${openSection === 'tushuncha' ? 'bg-emerald-500 text-white' : 'bg-emerald-100 text-emerald-600'}`}>
+                        <span className="material-symbols-outlined text-lg sm:text-xl">psychology</span>
+                      </div>
+                      <span className="font-semibold text-slate-800 text-sm sm:text-base">Ota-onaga tushuncha</span>
+                    </div>
+                    <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'tushuncha' ? 'rotate-180' : ''}`}>expand_more</span>
+                  </button>
+                  {openSection === 'tushuncha' && (
+                    <div className="px-4 sm:px-5 py-4 sm:py-5 bg-white border-t border-slate-100">
+                      <p className="text-slate-700 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{lesson.tushuncha}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Hayotiy misol */}
+              {lesson.misol && (
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setOpenSection(openSection === 'misol' ? null : 'misol')}
+                    className={`w-full flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 transition-colors ${openSection === 'misol' ? 'bg-amber-50' : 'bg-slate-50 hover:bg-slate-100'}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${openSection === 'misol' ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-600'}`}>
+                        <span className="material-symbols-outlined text-lg sm:text-xl">auto_stories</span>
+                      </div>
+                      <span className="font-semibold text-slate-800 text-sm sm:text-base">Hayotiy misol</span>
+                    </div>
+                    <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'misol' ? 'rotate-180' : ''}`}>expand_more</span>
+                  </button>
+                  {openSection === 'misol' && (
+                    <div className="px-4 sm:px-5 py-4 sm:py-5 bg-white border-t border-slate-100">
+                      <p className="text-slate-700 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{lesson.misol}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Amaliy mashq */}
+              {lesson.amaliy && (
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setOpenSection(openSection === 'amaliy' ? null : 'amaliy')}
+                    className={`w-full flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 transition-colors ${openSection === 'amaliy' ? 'bg-sky-50' : 'bg-slate-50 hover:bg-slate-100'}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${openSection === 'amaliy' ? 'bg-sky-500 text-white' : 'bg-sky-100 text-sky-600'}`}>
+                        <span className="material-symbols-outlined text-lg sm:text-xl">fitness_center</span>
+                      </div>
+                      <span className="font-semibold text-slate-800 text-sm sm:text-base">Amaliy mashq</span>
+                    </div>
+                    <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'amaliy' ? 'rotate-180' : ''}`}>expand_more</span>
+                  </button>
+                  {openSection === 'amaliy' && (
+                    <div className="px-4 sm:px-5 py-4 sm:py-5 bg-white border-t border-slate-100">
+                      <p className="text-slate-700 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{lesson.amaliy}</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 

@@ -32,6 +32,7 @@ const sectionSchema = new mongoose.Schema({
   icon: { type: String, default: 'folder' },
   color: { type: String, default: 'from-emerald-500 to-emerald-600' },
   orderIndex: { type: Number, default: 0 },
+  status: { type: String, enum: ['active', 'pause'], default: 'active' },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -42,6 +43,8 @@ const categorySchema = new mongoose.Schema({
   description: { type: String, default: '' },
   icon: { type: String, default: 'category' },
   color: { type: String, default: 'green' },
+  orderIndex: { type: Number, default: 0 },
+  status: { type: String, enum: ['active', 'pause'], default: 'active' },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -50,6 +53,9 @@ const lessonSchema = new mongoose.Schema({
   categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
   title: { type: String, required: true },
   content: { type: String, default: '' },
+  tushuncha: { type: String, default: '' },
+  misol: { type: String, default: '' },
+  amaliy: { type: String, default: '' },
   duration: { type: String, default: '5 daqiqa' },
   type: { type: String, enum: ['article', 'video', 'audio'], default: 'article' },
   videoUrl: { type: String, default: '' },

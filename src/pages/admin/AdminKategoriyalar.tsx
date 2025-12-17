@@ -9,6 +9,8 @@ interface Category {
   description: string;
   icon: string;
   color: string;
+  orderIndex: number;
+  status: 'active' | 'pause';
   lessonCount: number;
 }
 
@@ -27,7 +29,7 @@ export function AdminKategoriyalar() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ sectionId: '', name: '', description: '', icon: 'category', color: 'green' });
+  const [form, setForm] = useState({ sectionId: '', name: '', description: '', icon: 'category', color: 'green', orderIndex: 0, status: 'active' as 'active' | 'pause' });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -52,10 +54,10 @@ export function AdminKategoriyalar() {
   const openModal = (category?: Category) => {
     if (category) {
       setEditingId(category.id);
-      setForm({ sectionId: category.sectionId || '', name: category.name, description: category.description, icon: category.icon, color: category.color });
+      setForm({ sectionId: category.sectionId || '', name: category.name, description: category.description, icon: category.icon, color: category.color, orderIndex: category.orderIndex || 0, status: category.status || 'active' });
     } else {
       setEditingId(null);
-      setForm({ sectionId: sections[0]?.id || '', name: '', description: '', icon: 'category', color: 'green' });
+      setForm({ sectionId: sections[0]?.id || '', name: '', description: '', icon: 'category', color: 'green', orderIndex: 0, status: 'active' });
     }
     setShowModal(true);
   };
@@ -190,6 +192,8 @@ export function AdminKategoriyalar() {
                     <tr className="bg-slate-50 border-b border-slate-100">
                       <th className="text-left px-6 py-4 font-semibold text-slate-600">Kategoriya</th>
                       <th className="text-left px-6 py-4 font-semibold text-slate-600 hidden md:table-cell">Tavsif</th>
+                      <th className="text-center px-6 py-4 font-semibold text-slate-600">Tartib</th>
+                      <th className="text-center px-6 py-4 font-semibold text-slate-600">Holat</th>
                       <th className="text-center px-6 py-4 font-semibold text-slate-600">Darslar</th>
                       <th className="text-right px-6 py-4 font-semibold text-slate-600">Amallar</th>
                     </tr>
@@ -206,6 +210,12 @@ export function AdminKategoriyalar() {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-slate-500 hidden md:table-cell max-w-xs truncate">{cat.description}</td>
+                        <td className="px-6 py-4 text-center font-semibold text-slate-600">{cat.orderIndex || 0}</td>
+                        <td className="px-6 py-4 text-center">
+                          <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${cat.status === 'pause' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                            {cat.status === 'pause' ? 'Pause' : 'Active'}
+                          </span>
+                        </td>
                         <td className="px-6 py-4 text-center">
                           <Link to={`/admin/darslar/${cat.id}`} className="inline-flex items-center gap-1 text-primary hover:underline font-semibold">
                             {cat.lessonCount} ta
@@ -317,6 +327,30 @@ export function AdminKategoriyalar() {
                       {form.color === color && <span className="material-symbols-outlined text-sm">check</span>}
                     </button>
                   ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Tartib raqami</label>
+                  <input
+                    type="number"
+                    value={form.orderIndex}
+                    onChange={(e) => setForm({ ...form, orderIndex: parseInt(e.target.value) || 0 })}
+                    className="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-lg focus:bg-white focus:border-primary outline-none transition-all text-sm"
+                    min="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Holat</label>
+                  <select
+                    value={form.status}
+                    onChange={(e) => setForm({ ...form, status: e.target.value as 'active' | 'pause' })}
+                    className="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-lg focus:bg-white focus:border-emerald-500 outline-none transition-all text-sm"
+                  >
+                    <option value="active">Active</option>
+                    <option value="pause">Pause</option>
+                  </select>
                 </div>
               </div>
               

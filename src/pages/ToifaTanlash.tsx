@@ -97,7 +97,7 @@ export function ToifaTanlash() {
           {toifalar.map((toifa) => (
             <Link
               key={toifa.id}
-              to={`/kategoriyalar?toifa=${toifa.id}`}
+              to={`/bolim`}
               className="group flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3 sm:py-4 bg-white shadow-sm hover:shadow-md transition-all duration-300 border-y border-slate-100 hover:bg-emerald-50"
             >
               <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br ${toifa.color} flex items-center justify-center text-white shadow`}>

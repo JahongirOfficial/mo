@@ -114,7 +114,7 @@ export function AdminPanel() {
           <div className="px-6 lg:px-8">
             <div className="flex items-center justify-between h-16 lg:h-20">
               <div className="flex items-center gap-4">
-                <button onClick={() => navigate('/kategoriyalar')} className="lg:hidden p-2 hover:bg-slate-100 rounded-xl">
+                <button onClick={() => navigate('/bolim')} className="lg:hidden p-2 hover:bg-slate-100 rounded-xl">
                   <span className="material-symbols-outlined">menu</span>
                 </button>
                 <div>

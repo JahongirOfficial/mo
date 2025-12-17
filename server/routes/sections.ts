@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Section, Category } from '../db';
+import { Section, Category, Lesson } from '../db';
 
 const router = Router();
 
@@ -18,6 +18,7 @@ router.get('/', async (req, res) => {
           icon: section.icon,
           color: section.color,
           orderIndex: section.orderIndex,
+          status: section.status || 'active',
           categoryCount
         };
       })
@@ -37,20 +38,33 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ error: "Bo'lim topilmadi" });
     }
     
-    const categories = await Category.find({ sectionId: section._id });
+    const categories = await Category.find({ sectionId: section._id }).sort({ orderIndex: 1 });
+    
+    // Get lesson count for each category
+    const categoriesWithCount = await Promise.all(
+      categories.map(async (c) => {
+        const lessonCount = await Lesson.countDocuments({ categoryId: c._id });
+        return {
+          id: c._id,
+          name: c.name,
+          description: c.description,
+          icon: c.icon,
+          color: c.color,
+          orderIndex: c.orderIndex || 0,
+          status: c.status || 'active',
+          lessonCount
+        };
+      })
+    );
     
     res.json({
       id: section._id,
       name: section.name,
       icon: section.icon,
       color: section.color,
-      categories: categories.map(c => ({
-        id: c._id,
-        name: c.name,
-        description: c.description,
-        icon: c.icon,
-        color: c.color
-      }))
+      orderIndex: section.orderIndex,
+      status: section.status || 'active',
+      categories: categoriesWithCount
     });
   } catch (error) {
     res.status(500).json({ error: "Bo'limni olishda xatolik" });
@@ -64,15 +78,19 @@ router.post('/', async (req: any, res) => {
   }
   
   try {
-    const { name, icon, color } = req.body;
-    const lastSection = await Section.findOne().sort({ orderIndex: -1 });
-    const orderIndex = lastSection ? lastSection.orderIndex + 1 : 0;
+    const { name, icon, color, orderIndex } = req.body;
+    let finalOrderIndex = orderIndex;
+    
+    if (finalOrderIndex === undefined) {
+      const lastSection = await Section.findOne().sort({ orderIndex: -1 });
+      finalOrderIndex = lastSection ? lastSection.orderIndex + 1 : 0;
+    }
     
     const section = await Section.create({
       name,
       icon: icon || 'folder',
       color: color || 'from-emerald-500 to-emerald-600',
-      orderIndex
+      orderIndex: finalOrderIndex
     });
     
     res.status(201).json({
@@ -95,10 +113,10 @@ router.put('/:id', async (req: any, res) => {
   }
   
   try {
-    const { name, icon, color } = req.body;
+    const { name, icon, color, orderIndex, status } = req.body;
     const section = await Section.findByIdAndUpdate(
       req.params.id,
-      { name, icon, color },
+      { name, icon, color, orderIndex: orderIndex ?? 0, status: status || 'active' },
       { new: true }
     );
     
@@ -110,7 +128,9 @@ router.put('/:id', async (req: any, res) => {
       id: section._id,
       name: section.name,
       icon: section.icon,
-      color: section.color
+      color: section.color,
+      orderIndex: section.orderIndex,
+      status: section.status
     });
   } catch (error) {
     res.status(500).json({ error: "Bo'limni yangilashda xatolik" });

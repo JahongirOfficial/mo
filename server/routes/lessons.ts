@@ -73,7 +73,7 @@ router.get('/:id', async (req, res) => {
 // Create lesson (admin only)
 router.post('/', isAdmin, async (req: AuthRequest, res) => {
   try {
-    const { categoryId, title, content, duration, type, videoUrl } = req.body;
+    const { categoryId, title, content, duration, type, videoUrl, tushuncha, misol, amaliy } = req.body;
 
     if (!categoryId || !title) {
       return res.status(400).json({ error: 'Kategoriya va dars nomi kiritilishi shart' });
@@ -92,6 +92,9 @@ router.post('/', isAdmin, async (req: AuthRequest, res) => {
       categoryId,
       title,
       content: content || '',
+      tushuncha: tushuncha || '',
+      misol: misol || '',
+      amaliy: amaliy || '',
       duration: duration || '5 daqiqa',
       type: type || 'article',
       videoUrl: videoUrl || '',
@@ -108,11 +111,11 @@ router.post('/', isAdmin, async (req: AuthRequest, res) => {
 // Update lesson (admin only)
 router.put('/:id', isAdmin, async (req: AuthRequest, res) => {
   try {
-    const { title, content, duration, type, orderIndex, videoUrl } = req.body;
+    const { title, content, duration, type, orderIndex, videoUrl, tushuncha, misol, amaliy } = req.body;
 
     const lesson = await Lesson.findByIdAndUpdate(
       req.params.id,
-      { title, content, duration, type, orderIndex, videoUrl },
+      { title, content, duration, type, orderIndex, videoUrl, tushuncha, misol, amaliy },
       { new: true }
     );
 

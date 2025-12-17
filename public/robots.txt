@@ -11,4 +11,4 @@ Disallow: /api/
 
 # Allow search engines to crawl all public pages
 Allow: /kirish
-Allow: /kategoriyalar
+Allow: /bolim

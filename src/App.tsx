@@ -6,7 +6,7 @@ import { AiChat } from './components/AiChat';
 import { BoshSahifa } from './pages/BoshSahifa';
 import { KirishSahifasi } from './pages/KirishSahifasi';
 import { BolimTanlash } from './pages/BolimTanlash';
-import { Kategoriyalar } from './pages/Kategoriyalar';
+
 import { KategoriyaBolimi } from './pages/KategoriyaBolimi';
 import { DarsSahifasi } from './pages/DarsSahifasi';
 import { AdminPanel } from './pages/admin/AdminPanel';
@@ -64,7 +64,6 @@ function AppRoutes() {
       
       {/* Protected */}
       <Route path="/bolim" element={<ProtectedRoute><BolimTanlash /></ProtectedRoute>} />
-      <Route path="/kategoriyalar" element={<ProtectedRoute><Kategoriyalar /></ProtectedRoute>} />
       <Route path="/kategoriya/:id" element={<ProtectedRoute><KategoriyaBolimi /></ProtectedRoute>} />
       <Route path="/dars/:id" element={<ProtectedRoute><DarsSahifasi /></ProtectedRoute>} />
       

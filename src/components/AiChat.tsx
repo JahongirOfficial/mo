@@ -63,11 +63,11 @@ export function AiChat() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 ${
-          isOpen ? 'bg-slate-600 rotate-90' : 'bg-gradient-to-br from-emerald-500 to-emerald-600 hover:scale-110'
+          isOpen ? 'bg-slate-600 rotate-90' : 'bg-sky-500 hover:bg-sky-600 hover:scale-110'
         }`}
       >
-        <span className="material-symbols-outlined text-white text-2xl">
-          {isOpen ? 'close' : 'smart_toy'}
+        <span className="material-symbols-outlined text-white text-3xl">
+          {isOpen ? 'close' : 'support_agent'}
         </span>
       </button>
 
@@ -77,7 +77,7 @@ export function AiChat() {
           {/* Header */}
           <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-3 flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <span className="material-symbols-outlined text-white">smart_toy</span>
+              <span className="material-symbols-outlined text-white">support_agent</span>
             </div>
             <div className="flex-1">
               <h3 className="font-bold text-white text-sm">AI Yordamchi</h3>

@@ -7,6 +7,8 @@ interface Section {
   name: string;
   icon: string;
   color: string;
+  orderIndex: number;
+  status: 'active' | 'pause';
   categoryCount: number;
 }
 
@@ -25,7 +27,7 @@ export function AdminBolimlar() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: '', icon: 'folder', color: 'from-emerald-500 to-emerald-600' });
+  const [form, setForm] = useState({ name: '', icon: 'folder', color: 'from-emerald-500 to-emerald-600', orderIndex: 0, status: 'active' as 'active' | 'pause' });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -46,10 +48,10 @@ export function AdminBolimlar() {
   const openModal = (section?: Section) => {
     if (section) {
       setEditingId(section.id);
-      setForm({ name: section.name, icon: section.icon, color: section.color });
+      setForm({ name: section.name, icon: section.icon, color: section.color, orderIndex: section.orderIndex || 0, status: section.status || 'active' });
     } else {
       setEditingId(null);
-      setForm({ name: '', icon: 'folder', color: 'from-emerald-500 to-emerald-600' });
+      setForm({ name: '', icon: 'folder', color: 'from-emerald-500 to-emerald-600', orderIndex: sections.length, status: 'active' });
     }
     setShowModal(true);
   };
@@ -173,14 +175,19 @@ export function AdminBolimlar() {
                 <table className="w-full">
                   <thead>
                     <tr className="bg-slate-50 border-b border-slate-100">
+                      <th className="text-center px-4 py-4 font-semibold text-slate-600 w-16">№</th>
                       <th className="text-left px-6 py-4 font-semibold text-slate-600">Bo'lim</th>
+                      <th className="text-center px-6 py-4 font-semibold text-slate-600">Holat</th>
                       <th className="text-center px-6 py-4 font-semibold text-slate-600">Kategoriyalar</th>
                       <th className="text-right px-6 py-4 font-semibold text-slate-600">Amallar</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {sections.map((section) => (
+                    {sections.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0)).map((section) => (
                       <tr key={section.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-4 py-4 text-center">
+                          <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 text-slate-600 font-bold text-sm">{section.orderIndex || 0}</span>
+                        </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
                             <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${section.color} flex items-center justify-center text-white shadow-lg`}>
@@ -188,6 +195,12 @@ export function AdminBolimlar() {
                             </div>
                             <span className="font-semibold text-slate-900">{section.name}</span>
                           </div>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold ${section.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                            <span className="material-symbols-outlined text-sm">{section.status === 'active' ? 'check_circle' : 'pause_circle'}</span>
+                            {section.status === 'active' ? 'Faol' : 'Pauza'}
+                          </span>
                         </td>
                         <td className="px-6 py-4 text-center">
                           <span className="font-semibold text-slate-700">{section.categoryCount} ta</span>
@@ -271,6 +284,31 @@ export function AdminBolimlar() {
                       {form.color === color && <span className="material-symbols-outlined text-sm">check</span>}
                     </button>
                   ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Tartib raqami</label>
+                  <input
+                    type="number"
+                    value={form.orderIndex}
+                    onChange={(e) => setForm({ ...form, orderIndex: parseInt(e.target.value) || 0 })}
+                    className="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-lg focus:bg-white focus:border-emerald-500 outline-none transition-all text-sm"
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Holat</label>
+                  <select
+                    value={form.status}
+                    onChange={(e) => setForm({ ...form, status: e.target.value as 'active' | 'pause' })}
+                    className="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-lg focus:bg-white focus:border-emerald-500 outline-none transition-all text-sm"
+                  >
+                    <option value="active">Faol</option>
+                    <option value="pause">Pauza</option>
+                  </select>
                 </div>
               </div>
               

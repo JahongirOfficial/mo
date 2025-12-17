@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { categoriesAPI } from '../api';
+import { sectionsAPI, lessonsAPI } from '../api';
 import { useAuth } from '../context/AuthContext';
 
 interface Lesson {
@@ -17,48 +17,84 @@ interface Category {
   description: string;
   icon: string;
   color: string;
-  lessons: Lesson[];
+  orderIndex?: number;
+  status?: 'active' | 'pause';
+  lessonCount?: number;
+}
+
+interface Section {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  status: 'active' | 'pause';
+  orderIndex: number;
+  categories: Category[];
 }
 
 export function KategoriyaBolimi() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isSubscribed, isAdmin, subscription } = useAuth();
-  const [category, setCategory] = useState<Category | null>(null);
+  const { isAdmin, subscription } = useAuth();
+  const [section, setSection] = useState<Section | null>(null);
   const [loading, setLoading] = useState(true);
   const [accessDenied, setAccessDenied] = useState(false);
-  const [, setCategoryIndex] = useState<number>(-1);
+  const [pausedSectionName, setPausedSectionName] = useState('');
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const [categoryLessons, setCategoryLessons] = useState<Record<string, Lesson[]>>({});
+  const [showPauseModal, setShowPauseModal] = useState(false);
+  const [pausedCategoryName, setPausedCategoryName] = useState('');
 
   useEffect(() => {
-    loadCategory();
-    // Load completed lessons from localStorage
+    loadSection();
     const completed = JSON.parse(localStorage.getItem('completedLessons') || '[]');
     setCompletedLessons(completed);
-  }, [id]);
+  }, [id, isAdmin]);
 
-  const loadCategory = async () => {
+  const loadSection = async () => {
     try {
-      // First get all categories to check index
-      const allCategoriesRes = await categoriesAPI.getAll();
-      const allCategories = allCategoriesRes.data;
-      const currentIndex = allCategories.findIndex((c: Category) => c.id === id);
-      setCategoryIndex(currentIndex);
+      const allSectionsRes = await sectionsAPI.getAll();
+      const allSections = allSectionsRes.data.sort((a: Section, b: Section) => (a.orderIndex || 0) - (b.orderIndex || 0));
+      const currentIndex = allSections.findIndex((s: Section) => s.id === id);
+      const currentSection = allSections[currentIndex];
       
-      // Check if user has access (admin, subscribed, or first category)
-      if (!isAdmin && !isSubscribed && currentIndex > 0) {
+      if (!isAdmin && currentSection?.status === 'pause') {
+        const prevSection = allSections[currentIndex - 1];
+        setPausedSectionName(prevSection?.name || 'oldingi bo\'lim');
         setAccessDenied(true);
         setLoading(false);
         return;
       }
       
-      const res = await categoriesAPI.getOne(id!);
-      setCategory(res.data);
+      const res = await sectionsAPI.getOne(id!);
+      console.log(`📂 Bo'lim ochildi: "${res.data.name}" | Status: ${res.data.status || 'active'} | isAdmin: ${isAdmin}`);
+      setSection(res.data);
     } catch (err: any) {
       console.error(err);
-      navigate('/kategoriyalar');
+      navigate('/bolim');
     } finally {
       setLoading(false);
+    }
+  };
+
+
+  const loadCategoryLessons = async (categoryId: string) => {
+    if (categoryLessons[categoryId]) return;
+    try {
+      const res = await lessonsAPI.getAll(categoryId);
+      setCategoryLessons(prev => ({ ...prev, [categoryId]: res.data }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const toggleCategory = (categoryId: string) => {
+    if (expandedCategory === categoryId) {
+      setExpandedCategory(null);
+    } else {
+      setExpandedCategory(categoryId);
+      loadCategoryLessons(categoryId);
     }
   };
 
@@ -70,9 +106,9 @@ export function KategoriyaBolimi() {
 
   const colorClasses: Record<string, { bg: string; gradient: string; light: string }> = {
     green: { bg: 'bg-emerald-500', gradient: 'from-emerald-500 to-emerald-600', light: 'bg-emerald-50' },
-    blue: { bg: 'bg-emerald-500', gradient: 'from-emerald-500 to-emerald-600', light: 'bg-emerald-50' },
+    blue: { bg: 'bg-blue-500', gradient: 'from-blue-500 to-blue-600', light: 'bg-blue-50' },
     red: { bg: 'bg-red-500', gradient: 'from-red-500 to-red-600', light: 'bg-red-50' },
-    purple: { bg: 'bg-emerald-500', gradient: 'from-emerald-500 to-emerald-600', light: 'bg-purple-50' },
+    purple: { bg: 'bg-purple-500', gradient: 'from-purple-500 to-purple-600', light: 'bg-purple-50' },
     orange: { bg: 'bg-orange-500', gradient: 'from-orange-500 to-orange-600', light: 'bg-orange-50' },
     teal: { bg: 'bg-teal-500', gradient: 'from-teal-500 to-teal-600', light: 'bg-teal-50' },
   };
@@ -92,47 +128,11 @@ export function KategoriyaBolimi() {
           <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-5">
             <span className="material-symbols-outlined text-3xl text-amber-600">lock</span>
           </div>
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">Obuna talab qilinadi</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">Bo'lim qulflangan</h2>
           <p className="text-slate-600 mb-5 text-sm">
-            Bu kategoriyani ochish uchun oylik obunani faollashtiring. Hozircha faqat birinchi kategoriya bepul.
+            Bu bo'limni ochish uchun avval <strong>"{pausedSectionName}"</strong> bo'limini tugatishingiz kerak.
           </p>
-          
-          {/* Price */}
-          <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl p-4 text-white text-center mb-4">
-            <p className="text-emerald-100 text-xs mb-1">Oylik obuna narxi</p>
-            <p className="text-2xl font-bold">50,000 so'm</p>
-          </div>
-          
-          {/* Card Number */}
-          <div className="bg-slate-50 rounded-xl p-4 mb-4 text-left">
-            <p className="text-slate-500 text-xs mb-2">To'lov uchun karta raqami:</p>
-            <div className="flex items-center justify-between">
-              <p className="font-bold text-slate-900 text-lg tracking-wider">5614 6827 1416 5471</p>
-              <button 
-                onClick={() => navigator.clipboard.writeText('5614682714165471')}
-                className="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
-                title="Nusxalash"
-              >
-                <span className="material-symbols-outlined text-lg">content_copy</span>
-              </button>
-            </div>
-            <p className="text-slate-500 text-xs mt-1">Hakimov Javohir</p>
-          </div>
-
-          {/* Telegram */}
-          <a
-            href="https://t.me/mukammal_ota_ona"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full py-3 bg-[#0088cc] text-white rounded-xl font-semibold hover:bg-[#0077b5] transition-colors mb-3"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
-            </svg>
-            Telegram orqali bog'lanish
-          </a>
-          
-          <Link to="/kategoriyalar" className="inline-flex items-center justify-center gap-2 w-full py-2.5 bg-slate-100 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-200 transition-colors">
+          <Link to="/bolim" className="inline-flex items-center justify-center gap-2 w-full py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold text-sm">
             <span className="material-symbols-outlined text-lg">arrow_back</span>Orqaga qaytish
           </Link>
         </div>
@@ -140,9 +140,10 @@ export function KategoriyaBolimi() {
     );
   }
 
-  if (!category) return null;
+  if (!section) return null;
 
-  const colors = colorClasses[category.color] || colorClasses.green;
+  const colors = colorClasses[section.color] || colorClasses.green;
+
 
   return (
     <div className="min-h-screen bg-slate-50 font-display">
@@ -150,12 +151,12 @@ export function KategoriyaBolimi() {
       <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-14 sm:h-16 lg:h-20 gap-3 sm:gap-4">
-            <button onClick={() => navigate('/kategoriyalar')} className="p-2 hover:bg-slate-100 rounded-xl transition-colors">
+            <button onClick={() => navigate('/bolim')} className="p-2 hover:bg-slate-100 rounded-xl transition-colors">
               <span className="material-symbols-outlined text-slate-600">arrow_back</span>
             </button>
             <div className="flex-1 min-w-0">
-              <h1 className="text-sm sm:text-lg lg:text-xl font-bold text-slate-900 truncate">{category.name}</h1>
-              <p className="text-xs sm:text-sm text-slate-500">{category.lessons.length} ta dars</p>
+              <h1 className="text-sm sm:text-lg lg:text-xl font-bold text-slate-900 truncate">{section.name}</h1>
+              <p className="text-xs sm:text-sm text-slate-500">{section.categories?.length || 0} ta kategoriya</p>
             </div>
             {!isAdmin && subscription && (
               <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-semibold text-xs sm:text-sm ${
@@ -166,7 +167,7 @@ export function KategoriyaBolimi() {
                 <span>{subscription.daysLeft} kun qoldi</span>
               </div>
             )}
-            <Link to="/kategoriyalar" className="p-2 hover:bg-slate-100 rounded-xl transition-colors">
+            <Link to="/bolim" className="p-2 hover:bg-slate-100 rounded-xl transition-colors">
               <span className="material-symbols-outlined text-slate-600">home</span>
             </Link>
           </div>
@@ -174,129 +175,172 @@ export function KategoriyaBolimi() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
-        {/* Category Hero */}
+        {/* Section Hero */}
         <div className={`bg-gradient-to-br ${colors.gradient} rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-12 mb-6 sm:mb-10 text-white relative overflow-hidden`}>
           <div className="absolute top-0 right-0 w-40 sm:w-64 h-40 sm:h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="absolute bottom-0 left-0 w-32 sm:w-48 h-32 sm:h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
           
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
             <div className="w-14 h-14 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center">
-              <span className="material-symbols-outlined text-3xl sm:text-5xl lg:text-6xl">{category.icon}</span>
+              <span className="material-symbols-outlined text-3xl sm:text-5xl lg:text-6xl">{section.icon}</span>
             </div>
             <div className="flex-1">
-              <h2 className="text-xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">{category.name}</h2>
-              <p className="text-white/80 text-sm sm:text-lg">{category.description}</p>
+              <h2 className="text-xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">{section.name}</h2>
+              <p className="text-white/80 text-sm sm:text-lg">Kategoriyalarni tanlang va darslarni boshlang</p>
             </div>
             <div className="flex items-center gap-4 sm:gap-6 lg:gap-8 mt-2 sm:mt-0">
               <div className="text-center">
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">{category.lessons.length}</p>
-                <p className="text-white/70 text-xs sm:text-sm">Darslar</p>
-              </div>
-              <div className="w-px h-10 sm:h-12 bg-white/20"></div>
-              <div className="text-center">
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">~{category.lessons.length * 5}</p>
-                <p className="text-white/70 text-xs sm:text-sm">Daqiqa</p>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">{section.categories?.length || 0}</p>
+                <p className="text-white/70 text-xs sm:text-sm">Kategoriya</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Lessons List */}
+        {/* Categories List */}
         <div className="mb-4 sm:mb-6 flex items-center justify-between">
-          <h3 className="text-base sm:text-xl font-bold text-slate-900">Darslar ro'yxati</h3>
-          <span className="text-xs sm:text-sm text-slate-500">{category.lessons.length} ta dars</span>
+          <h3 className="text-base sm:text-xl font-bold text-slate-900">Kategoriyalar</h3>
+          <span className="text-xs sm:text-sm text-slate-500">{section.categories?.length || 0} ta</span>
         </div>
         
-        {category.lessons.length === 0 ? (
+        {!section.categories || section.categories.length === 0 ? (
           <div className="bg-white rounded-2xl sm:rounded-3xl p-10 sm:p-16 text-center">
             <div className={`w-16 sm:w-20 h-16 sm:h-20 rounded-xl sm:rounded-2xl ${colors.light} flex items-center justify-center mx-auto mb-4 sm:mb-6`}>
-              <span className="material-symbols-outlined text-3xl sm:text-4xl text-slate-400">school</span>
+              <span className="material-symbols-outlined text-3xl sm:text-4xl text-slate-400">folder_off</span>
             </div>
-            <p className="text-base sm:text-xl text-slate-500">Bu kategoriyada hali darslar yo'q</p>
+            <p className="text-base sm:text-xl text-slate-500">Bu bo'limda hali kategoriyalar yo'q</p>
           </div>
         ) : (
           <div className="space-y-3 sm:space-y-4">
-            {category.lessons.map((lesson, index) => {
-              const type = typeConfig[lesson.type] || typeConfig.article;
-              const isLessonCompleted = completedLessons.includes(lesson.id);
-              // Dars ochiq: admin, birinchi dars, yoki oldingi dars bajarilgan
-              const prevLessonId = index > 0 ? category.lessons[index - 1].id : null;
-              const isPrevCompleted = prevLessonId ? completedLessons.includes(prevLessonId) : true;
-              const isUnlocked = isAdmin || index === 0 || isPrevCompleted;
-              
-              if (!isUnlocked) {
-                return (
-                  <div
-                    key={lesson.id}
-                    className="flex items-center gap-3 sm:gap-4 lg:gap-6 bg-white/60 p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl border border-slate-100 opacity-60"
-                  >
-                    <div className="w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-base sm:text-xl lg:text-2xl shrink-0">
-                      <span className="material-symbols-outlined text-xl sm:text-2xl">lock</span>
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-sm sm:text-lg text-slate-400 mb-1 truncate">
-                        {lesson.title}
-                      </h4>
-                      <p className="text-xs sm:text-sm text-slate-400">Oldingi darsni bajaring</p>
-                    </div>
-                    
-                    <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-300 shrink-0">
-                      <span className="material-symbols-outlined text-lg sm:text-2xl">lock</span>
-                    </div>
-                  </div>
-                );
-              }
+            {section.categories.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0)).map((category, catIndex) => {
+              const catColors = colorClasses[category.color] || colorClasses.green;
+              const isExpanded = expandedCategory === category.id;
+              const lessons = categoryLessons[category.id] || [];
+              const sortedCategories = [...section.categories].sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+              const prevCategory = sortedCategories[catIndex - 1];
+              const isPaused = !isAdmin && category.status === 'pause';
+              console.log(`📁 Kategoriya: "${category.name}" | Status: ${category.status || 'undefined'} | isPaused: ${isPaused}`);
+
+              const handleCategoryClick = () => {
+                if (isPaused) {
+                  setPausedCategoryName(prevCategory?.name || 'oldingi kategoriya');
+                  setShowPauseModal(true);
+                } else {
+                  toggleCategory(category.id);
+                }
+              };
               
               return (
-                <Link
-                  key={lesson.id}
-                  to={`/dars/${lesson.id}`}
-                  className="group flex items-center gap-3 sm:gap-4 lg:gap-6 bg-white p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-lg transition-all border border-slate-100 hover:border-primary/20"
-                >
-                  <div className={`w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl ${isLessonCompleted ? 'bg-emerald-500' : `bg-gradient-to-br ${colors.gradient}`} flex items-center justify-center text-white font-bold text-base sm:text-xl lg:text-2xl shrink-0 shadow-lg group-hover:scale-110 transition-transform`}>
-                    {isLessonCompleted ? (
-                      <span className="material-symbols-outlined text-xl sm:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
-                    ) : (
-                      index + 1
-                    )}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-sm sm:text-lg text-slate-900 group-hover:text-primary transition-colors mb-1 truncate">
-                      {lesson.title}
-                    </h4>
-                    <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg ${type.color} font-medium`}>
-                        <span className="material-symbols-outlined text-sm">{type.icon}</span>
-                        <span className="hidden sm:inline">{type.label}</span>
-                      </span>
-                      <span className="text-slate-500 flex items-center gap-1">
-                        <span className="material-symbols-outlined text-sm">schedule</span>
-                        {lesson.duration}
-                      </span>
-                      {isLessonCompleted && (
-                        <span className="text-emerald-600 flex items-center gap-1 font-medium">
-                          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                          <span className="hidden sm:inline">Bajarildi</span>
-                        </span>
+                <div key={category.id} className={`bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-100 overflow-hidden ${isPaused ? 'opacity-70' : ''}`}>
+                  {/* Category Header */}
+                  <button
+                    onClick={handleCategoryClick}
+                    className={`w-full flex items-center gap-3 sm:gap-4 lg:gap-6 p-4 sm:p-5 lg:p-6 transition-all ${isPaused ? 'cursor-pointer' : 'hover:bg-slate-50'}`}
+                  >
+                    <div className={`w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${isPaused ? 'from-slate-400 to-slate-500' : catColors.gradient} flex items-center justify-center text-white font-bold text-base sm:text-xl lg:text-2xl shrink-0 shadow-lg`}>
+                      <span className="material-symbols-outlined text-xl sm:text-2xl lg:text-3xl">{isPaused ? 'lock' : category.icon}</span>
+                    </div>
+                    
+                    <div className="flex-1 min-w-0 text-left">
+                      <div className="flex items-center gap-2">
+                        <h4 className={`font-bold text-sm sm:text-lg mb-1 truncate ${isPaused ? 'text-slate-500' : 'text-slate-900'}`}>{category.name}</h4>
+
+                      </div>
+                      <p className="text-xs sm:text-sm text-slate-500 truncate">{category.description}</p>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <span className="text-xs sm:text-sm text-slate-500">{category.lessonCount || 0} dars</span>
+                      {isPaused ? (
+                        <span className="material-symbols-outlined text-slate-400">lock</span>
+                      ) : (
+                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}>expand_more</span>
                       )}
                     </div>
-                  </div>
+                  </button>
                   
-                  <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-slate-100 group-hover:bg-primary flex items-center justify-center text-slate-400 group-hover:text-white transition-all shrink-0">
-                    <span className="material-symbols-outlined text-lg sm:text-2xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                  </div>
-                </Link>
+                  {/* Lessons Dropdown */}
+                  {isExpanded && !isPaused && (
+                    <div className="border-t border-slate-100 bg-slate-50 p-3 sm:p-4">
+                      {lessons.length === 0 ? (
+                        <p className="text-center text-slate-500 py-4 text-sm">Bu kategoriyada hali darslar yo'q</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {lessons.map((lesson, index) => {
+                            const type = typeConfig[lesson.type] || typeConfig.article;
+                            const isLessonCompleted = completedLessons.includes(lesson.id);
+                            const prevLessonId = index > 0 ? lessons[index - 1].id : null;
+                            const isPrevCompleted = prevLessonId ? completedLessons.includes(prevLessonId) : true;
+                            const isUnlocked = isAdmin || index === 0 || isPrevCompleted;
+                            
+                            if (!isUnlocked) {
+                              return (
+                                <div key={lesson.id} className="flex items-center gap-3 p-3 bg-white/60 rounded-xl opacity-60">
+                                  <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-sm shrink-0">
+                                    <span className="material-symbols-outlined text-base">lock</span>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-sm text-slate-400 truncate">{lesson.title}</p>
+                                    <p className="text-xs text-slate-400">Oldingi darsni bajaring</p>
+                                  </div>
+                                </div>
+                              );
+                            }
+                            
+                            return (
+                              <Link key={lesson.id} to={`/dars/${lesson.id}`} className="group flex items-center gap-3 p-3 bg-white rounded-xl hover:shadow-md transition-all">
+                                <div className={`w-8 h-8 rounded-lg ${isLessonCompleted ? 'bg-emerald-500' : `bg-gradient-to-br ${catColors.gradient}`} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
+                                  {isLessonCompleted ? (
+                                    <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
+                                  ) : (
+                                    index + 1
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-sm text-slate-900 group-hover:text-emerald-600 truncate">{lesson.title}</p>
+                                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                                    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded ${type.color}`}>
+                                      <span className="material-symbols-outlined text-xs">{type.icon}</span>
+                                    </span>
+                                    <span>{lesson.duration}</span>
+                                  </div>
+                                </div>
+                                <span className="material-symbols-outlined text-slate-400 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all">arrow_forward</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
         )}
       </main>
+
+      {/* Pause Modal */}
+      {showPauseModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setShowPauseModal(false)} />
+          <div className="relative bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
+            <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-3xl text-amber-600">lock</span>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Kategoriya qulflangan</h3>
+            <p className="text-slate-600 text-sm mb-6">
+              Bu kategoriyani ochish uchun avval <strong>"{pausedCategoryName}"</strong> kategoriyasini tugatishingiz kerak.
+            </p>
+            <button
+              onClick={() => setShowPauseModal(false)}
+              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold"
+            >
+              Tushundim
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-
-
-
