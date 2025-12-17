@@ -298,17 +298,7 @@ export function DarsSahifasi() {
             </div>
           )}
 
-          {/* Meta */}
-          <div className="flex items-center gap-4 sm:gap-6 px-4 sm:px-6 lg:px-10 py-4 border-b border-slate-100 bg-slate-50 text-sm">
-            <div className="flex items-center gap-2 text-slate-600">
-              <span className="material-symbols-outlined text-base">schedule</span>
-              <span className="font-medium">{lesson.duration}</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-600">
-              <span className="material-symbols-outlined text-base">folder</span>
-              <span className="font-medium truncate">{lesson.categoryName}</span>
-            </div>
-          </div>
+
 
           {/* Content */}
           <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 lg:py-10">
@@ -335,17 +325,7 @@ export function DarsSahifasi() {
               </div>
             )}
 
-            <div className="mt-8 p-4 sm:p-6 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl sm:rounded-2xl border border-amber-100">
-              <div className="flex gap-3 sm:gap-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-                  <span className="material-symbols-outlined text-xl sm:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>lightbulb</span>
-                </div>
-                <div>
-                  <h4 className="font-bold text-slate-900 mb-1 sm:mb-2 text-sm sm:text-lg">Maslahat</h4>
-                  <p className="text-slate-600 leading-relaxed text-xs sm:text-sm">Darsni o'qib bo'lgach, o'rgangan bilimlaringizni amalda qo'llashga harakat qiling.</p>
-                </div>
-              </div>
-            </div>
+
           </div>
         </article>
 
@@ -362,7 +342,7 @@ export function DarsSahifasi() {
           <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: isCompleted ? "'FILL' 1" : "'FILL' 0" }}>
             {isCompleted ? 'check_circle' : 'task_alt'}
           </span>
-          {isCompleted ? 'Bajarildi ✓' : 'Bajardim'}
+          {isCompleted ? 'Amalda bajardim ✓' : 'Amalda bajardim'}
         </button>
 
         {/* Navigation */}

@@ -59,17 +59,26 @@ export function AiChat() {
 
   return (
     <>
-      {/* Floating Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 ${
-          isOpen ? 'bg-slate-600 rotate-90' : 'bg-sky-500 hover:bg-sky-600 hover:scale-110'
-        }`}
-      >
-        <span className="material-symbols-outlined text-white text-3xl">
-          {isOpen ? 'close' : 'support_agent'}
-        </span>
-      </button>
+      {/* Floating Button with Ripple Effect */}
+      <div className="fixed bottom-6 right-6 z-50">
+        {/* Ripple rings */}
+        {!isOpen && (
+          <>
+            <span className="absolute inset-0 w-14 h-14 rounded-full bg-sky-400 animate-ping opacity-30"></span>
+            <span className="absolute inset-0 w-14 h-14 rounded-full bg-sky-400 animate-ping opacity-20" style={{ animationDelay: '0.5s' }}></span>
+          </>
+        )}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={`relative w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
+            isOpen ? 'bg-slate-600 rotate-90' : 'bg-sky-500 hover:bg-sky-600 hover:scale-110'
+          }`}
+        >
+          <span className="material-symbols-outlined text-white text-3xl">
+            {isOpen ? 'close' : 'support_agent'}
+          </span>
+        </button>
+      </div>
 
       {/* Chat Window */}
       {isOpen && (
