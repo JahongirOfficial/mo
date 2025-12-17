@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-const API_URL = `http://${window.location.hostname}:3001/api`;
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? `http://${window.location.hostname}:3001/api`
+  : `https://${window.location.hostname}/api`;
 
 export function BoshSahifa() {
   const [showLeadModal, setShowLeadModal] = useState(false);

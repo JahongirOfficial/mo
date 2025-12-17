@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-// Dinamik API URL - boshqa PC'dan ham ishlaydi
-const API_URL = `http://${window.location.hostname}:3001/api`;
+// Dinamik API URL - HTTPS/HTTP ga qarab
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? `http://${window.location.hostname}:3001/api`
+  : `https://${window.location.hostname}/api`;
 
 const api = axios.create({
   baseURL: API_URL,
