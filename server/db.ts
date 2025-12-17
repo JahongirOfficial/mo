@@ -67,14 +67,14 @@ async function seedData() {
   // Create admin if not exists
   const adminExists = await User.findOne({ role: 'admin' });
   if (!adminExists) {
-    const hashedPassword = bcrypt.hashSync('admin123', 10);
+    const hashedPassword = bcrypt.hashSync('20100804', 10);
     await User.create({
       fullName: 'Administrator',
-      phone: '+998901234567',
+      phone: '+998773109828',
       password: hashedPassword,
       role: 'admin'
     });
-    console.log('Admin yaratildi: +998901234567 / admin123');
+    console.log('Admin yaratildi: +998773109828 / 20100804');
   }
 
   // Seed sections if empty
