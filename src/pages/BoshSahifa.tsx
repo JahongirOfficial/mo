@@ -287,9 +287,6 @@ export function BoshSahifa() {
             ) : (
               <>
                 <div className="text-center mb-6">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center mx-auto mb-4">
-                    <span className="material-symbols-outlined text-2xl text-white">family_star</span>
-                  </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">Bepul maslahat oling!</h3>
                   <p className="text-slate-600 text-sm">Ma'lumotlaringizni qoldiring, mutaxassislarimiz siz bilan bog'lanadi</p>
                 </div>
