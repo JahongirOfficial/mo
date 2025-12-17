@@ -9,6 +9,32 @@ const api = axios.create({
   baseURL: API_URL,
 });
 
+// Simple cache
+const cache: Record<string, { data: any; timestamp: number }> = {};
+const CACHE_DURATION = 30000; // 30 sekund
+
+const getCached = (key: string) => {
+  const cached = cache[key];
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    return cached.data;
+  }
+  return null;
+};
+
+const setCache = (key: string, data: any) => {
+  cache[key] = { data, timestamp: Date.now() };
+};
+
+export const clearCache = (pattern?: string) => {
+  if (pattern) {
+    Object.keys(cache).forEach(key => {
+      if (key.includes(pattern)) delete cache[key];
+    });
+  } else {
+    Object.keys(cache).forEach(key => delete cache[key]);
+  }
+};
+
 // Add token to requests
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
@@ -25,31 +51,70 @@ export const authAPI = {
   getMe: () => api.get('/auth/me'),
 };
 
-// Sections (Bo'limlar)
+
+// Sections (Bo'limlar) - cached
 export const sectionsAPI = {
-  getAll: () => api.get('/sections'),
-  getOne: (id: string) => api.get(`/sections/${id}`),
-  create: (data: { name: string; icon?: string; color?: string }) => api.post('/sections', data),
-  update: (id: string, data: { name: string; icon?: string; color?: string }) => api.put(`/sections/${id}`, data),
-  delete: (id: string) => api.delete(`/sections/${id}`),
+  getAll: async () => {
+    const cached = getCached('sections');
+    if (cached) return { data: cached };
+    const res = await api.get('/sections');
+    setCache('sections', res.data);
+    return res;
+  },
+  getOne: async (id: string) => {
+    const cached = getCached(`section_${id}`);
+    if (cached) return { data: cached };
+    const res = await api.get(`/sections/${id}`);
+    setCache(`section_${id}`, res.data);
+    return res;
+  },
+  create: (data: { name: string; icon?: string; color?: string }) => { clearCache('sections'); return api.post('/sections', data); },
+  update: (id: string, data: { name: string; icon?: string; color?: string }) => { clearCache('section'); return api.put(`/sections/${id}`, data); },
+  delete: (id: string) => { clearCache('section'); return api.delete(`/sections/${id}`); },
 };
 
-// Categories
+// Categories - cached
 export const categoriesAPI = {
-  getAll: (sectionId?: string) => api.get('/categories', { params: { sectionId } }),
-  getOne: (id: string) => api.get(`/categories/${id}`),
-  create: (data: { sectionId?: string; name: string; description?: string; icon?: string; color?: string }) => api.post('/categories', data),
-  update: (id: string, data: { sectionId?: string; name: string; description?: string; icon?: string; color?: string }) => api.put(`/categories/${id}`, data),
-  delete: (id: string) => api.delete(`/categories/${id}`),
+  getAll: async (sectionId?: string) => {
+    const key = sectionId ? `categories_${sectionId}` : 'categories';
+    const cached = getCached(key);
+    if (cached) return { data: cached };
+    const res = await api.get('/categories', { params: { sectionId } });
+    setCache(key, res.data);
+    return res;
+  },
+  getOne: async (id: string) => {
+    const cached = getCached(`category_${id}`);
+    if (cached) return { data: cached };
+    const res = await api.get(`/categories/${id}`);
+    setCache(`category_${id}`, res.data);
+    return res;
+  },
+  create: (data: { sectionId?: string; name: string; description?: string; icon?: string; color?: string }) => { clearCache('categor'); return api.post('/categories', data); },
+  update: (id: string, data: { sectionId?: string; name: string; description?: string; icon?: string; color?: string }) => { clearCache('categor'); return api.put(`/categories/${id}`, data); },
+  delete: (id: string) => { clearCache('categor'); return api.delete(`/categories/${id}`); },
 };
 
-// Lessons
+// Lessons - cached
 export const lessonsAPI = {
-  getAll: (categoryId?: string) => api.get('/lessons', { params: { categoryId } }),
-  getOne: (id: string) => api.get(`/lessons/${id}`),
-  create: (data: { categoryId: string; title: string; content?: string; duration?: string; type?: string; videoUrl?: string }) => api.post('/lessons', data),
-  update: (id: string, data: { title: string; content?: string; duration?: string; type?: string; orderIndex?: number; videoUrl?: string }) => api.put(`/lessons/${id}`, data),
-  delete: (id: string) => api.delete(`/lessons/${id}`),
+  getAll: async (categoryId?: string) => {
+    const key = categoryId ? `lessons_${categoryId}` : 'lessons';
+    const cached = getCached(key);
+    if (cached) return { data: cached };
+    const res = await api.get('/lessons', { params: { categoryId } });
+    setCache(key, res.data);
+    return res;
+  },
+  getOne: async (id: string) => {
+    const cached = getCached(`lesson_${id}`);
+    if (cached) return { data: cached };
+    const res = await api.get(`/lessons/${id}`);
+    setCache(`lesson_${id}`, res.data);
+    return res;
+  },
+  create: (data: { categoryId: string; title: string; content?: string; duration?: string; type?: string; videoUrl?: string }) => { clearCache('lesson'); return api.post('/lessons', data); },
+  update: (id: string, data: { title: string; content?: string; duration?: string; type?: string; orderIndex?: number; videoUrl?: string }) => { clearCache('lesson'); return api.put(`/lessons/${id}`, data); },
+  delete: (id: string) => { clearCache('lesson'); return api.delete(`/lessons/${id}`); },
 };
 
 // Users (admin)

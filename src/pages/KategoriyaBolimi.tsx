@@ -45,6 +45,7 @@ export function KategoriyaBolimi() {
   const [categoryLessons, setCategoryLessons] = useState<Record<string, Lesson[]>>({});
   const [showPauseModal, setShowPauseModal] = useState(false);
   const [pausedCategoryName, setPausedCategoryName] = useState('');
+  const [loadingLessons, setLoadingLessons] = useState<string | null>(null);
 
   useEffect(() => {
     loadSection();
@@ -81,11 +82,14 @@ export function KategoriyaBolimi() {
 
   const loadCategoryLessons = async (categoryId: string) => {
     if (categoryLessons[categoryId]) return;
+    setLoadingLessons(categoryId);
     try {
       const res = await lessonsAPI.getAll(categoryId);
       setCategoryLessons(prev => ({ ...prev, [categoryId]: res.data }));
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoadingLessons(null);
     }
   };
 
@@ -262,7 +266,20 @@ export function KategoriyaBolimi() {
                   {/* Lessons Dropdown */}
                   {isExpanded && !isPaused && (
                     <div className="border-t border-slate-100 bg-slate-50 p-3 sm:p-4">
-                      {lessons.length === 0 ? (
+                      {loadingLessons === category.id ? (
+                        <div className="space-y-2">
+                          {[1, 2, 3].map((i) => (
+                            <div key={i} className="flex items-center gap-3 p-3 bg-white rounded-xl animate-pulse">
+                              <div className="w-8 h-8 rounded-lg bg-slate-200 shrink-0"></div>
+                              <div className="flex-1">
+                                <div className="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
+                                <div className="h-3 bg-slate-100 rounded w-1/2"></div>
+                              </div>
+                              <div className="w-6 h-6 rounded bg-slate-100"></div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : lessons.length === 0 ? (
                         <p className="text-center text-slate-500 py-4 text-sm">Bu kategoriyada hali darslar yo'q</p>
                       ) : (
                         <div className="space-y-2">
