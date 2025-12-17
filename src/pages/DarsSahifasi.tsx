@@ -99,7 +99,12 @@ export function DarsSahifasi() {
   // Get video URL with token
   const getVideoUrl = (videoUrl: string) => {
     const token = localStorage.getItem('token');
-    return `http://${window.location.hostname}:3001${videoUrl}?token=${token}`;
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocalhost) {
+      return `http://localhost:3001${videoUrl}?token=${token}`;
+    }
+    // Production: Nginx /api orqali backend'ga yo'naltiradi
+    return `/api${videoUrl}?token=${token}`;
   };
 
   const loadLesson = async () => {
