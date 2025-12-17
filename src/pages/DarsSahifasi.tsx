@@ -301,39 +301,38 @@ export function DarsSahifasi() {
 
 
           {/* Content */}
-          <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 lg:py-10">
-            {paragraphs.length > 0 ? (
-              <div className="prose prose-slate max-w-none">
-                {paragraphs.map((para, i) => {
-                  if (/^\d+\./.test(para.trim())) {
-                    return (
-                      <div key={i} className="flex gap-3 sm:gap-4 mb-4 p-3 sm:p-4 bg-slate-50 rounded-xl">
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0 text-sm">
-                          {para.trim().match(/^(\d+)\./)?.[1]}
+          {(paragraphs.length > 0 || lesson.type !== 'video') && (
+            <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8 lg:py-10">
+              {paragraphs.length > 0 ? (
+                <div className="prose prose-slate max-w-none">
+                  {paragraphs.map((para, i) => {
+                    if (/^\d+\./.test(para.trim())) {
+                      return (
+                        <div key={i} className="flex gap-3 sm:gap-4 mb-4 p-3 sm:p-4 bg-slate-50 rounded-xl">
+                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0 text-sm">
+                            {para.trim().match(/^(\d+)\./)?.[1]}
+                          </div>
+                          <p className="text-slate-700 leading-relaxed flex-1 m-0 text-sm sm:text-base">{para.trim().replace(/^\d+\.\s*/, '')}</p>
                         </div>
-                        <p className="text-slate-700 leading-relaxed flex-1 m-0 text-sm sm:text-base">{para.trim().replace(/^\d+\.\s*/, '')}</p>
-                      </div>
-                    );
-                  }
-                  return <p key={i} className="text-slate-700 leading-relaxed mb-5 text-sm sm:text-base lg:text-lg">{para}</p>;
-                })}
-              </div>
-            ) : lesson.type !== 'video' && (
-              <div className="text-center py-12">
-                <span className="material-symbols-outlined text-5xl text-slate-200 mb-4">description</span>
-                <p className="text-slate-500 text-sm sm:text-base">Bu dars uchun kontent hali qo'shilmagan.</p>
-              </div>
-            )}
-
-
-          </div>
+                      );
+                    }
+                    return <p key={i} className="text-slate-700 leading-relaxed mb-5 text-sm sm:text-base lg:text-lg">{para}</p>;
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <span className="material-symbols-outlined text-5xl text-slate-200 mb-4">description</span>
+                  <p className="text-slate-500 text-sm sm:text-base">Bu dars uchun kontent hali qo'shilmagan.</p>
+                </div>
+              )}
+            </div>
+          )}
         </article>
-
 
         {/* Complete Button */}
         <button
           onClick={handleComplete}
-          className={`w-full mt-6 sm:mt-8 py-4 sm:py-5 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg flex items-center justify-center gap-3 transition-all ${
+          className={`w-full mt-4 sm:mt-6 py-4 sm:py-5 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg flex items-center justify-center gap-3 transition-all ${
             isCompleted 
               ? 'bg-emerald-100 text-emerald-700' 
               : 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg hover:shadow-xl'
