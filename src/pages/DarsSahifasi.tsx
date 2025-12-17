@@ -104,7 +104,9 @@ export function DarsSahifasi() {
       return `http://localhost:3001${videoUrl}?token=${token}`;
     }
     // Production: Nginx /api orqali backend'ga yo'naltiradi
-    return `/api${videoUrl}?token=${token}`;
+    // videoUrl /api bilan boshlansa, qayta qo'shmaslik
+    const apiPath = videoUrl.startsWith('/api') ? videoUrl : `/api${videoUrl}`;
+    return `${apiPath}?token=${token}`;
   };
 
   const loadLesson = async () => {
