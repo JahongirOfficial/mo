@@ -62,7 +62,7 @@ export function KirishSahifasi() {
         }
         await register(fullName, phone, password);
       }
-      navigate('/kategoriyalar');
+      navigate('/bolim');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Xatolik yuz berdi');
     } finally {
