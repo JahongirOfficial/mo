@@ -345,19 +345,19 @@ export function DarsSahifasi() {
         </button>
 
         {/* Navigation */}
-        <div className="mt-4 sm:mt-6 grid sm:grid-cols-2 gap-3 sm:gap-4">
-          {lesson.prevLesson && (
-            <Link to={`/dars/${lesson.prevLesson.id}`} className="group flex items-center gap-3 sm:gap-4 p-4 sm:p-5 bg-white rounded-xl sm:rounded-2xl shadow-sm hover:shadow-lg transition-all border border-slate-100">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center text-slate-500 shrink-0">
-                <span className="material-symbols-outlined group-hover:-translate-x-1 transition-transform">arrow_back</span>
+        {lesson.prevLesson && (
+          <div className="mt-4 sm:mt-6">
+            <Link to={`/dars/${lesson.prevLesson.id}`} className="group flex items-center gap-3 p-3 sm:p-4 bg-white rounded-xl sm:rounded-2xl shadow-sm hover:shadow-lg transition-all border border-slate-100 overflow-hidden">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center text-slate-500 shrink-0">
+                <span className="material-symbols-outlined text-lg sm:text-xl group-hover:-translate-x-1 transition-transform">arrow_back</span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-slate-500 mb-0.5">Oldingi dars</p>
-                <p className="font-bold text-slate-900 truncate text-sm sm:text-base">{lesson.prevLesson.title}</p>
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <p className="text-xs text-slate-500 mb-0.5">Oldingi dars</p>
+                <p className="font-semibold text-slate-900 truncate text-sm">{lesson.prevLesson.title}</p>
               </div>
             </Link>
-          )}
-        </div>
+          </div>
+        )}
       </main>
       {/* Share Toast */}
       {showShareToast && (
