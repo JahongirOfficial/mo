@@ -137,6 +137,10 @@ export function AdminKategoriyalar() {
             <span className="material-symbols-outlined">group</span>
             Foydalanuvchilar
           </Link>
+          <Link to="/admin/sms" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2">
+            <span className="material-symbols-outlined">sms</span>
+            SMS Xabarnoma
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-slate-800">

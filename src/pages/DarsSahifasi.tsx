@@ -197,6 +197,7 @@ export function DarsSahifasi() {
           {lesson.type === 'video' && lesson.videoUrl && (
             <div className="relative bg-black aspect-video">
               <video 
+                key={lesson.id}
                 controls 
                 className="w-full h-full" 
                 controlsList="nodownload" 

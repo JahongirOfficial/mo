@@ -14,6 +14,7 @@ const AdminKategoriyalar = lazy(() => import('./pages/admin/AdminKategoriyalar')
 const AdminDarslar = lazy(() => import('./pages/admin/AdminDarslar').then(m => ({ default: m.AdminDarslar })));
 const AdminFoydalanuvchilar = lazy(() => import('./pages/admin/AdminFoydalanuvchilar').then(m => ({ default: m.AdminFoydalanuvchilar })));
 const AdminBolimlar = lazy(() => import('./pages/admin/AdminBolimlar').then(m => ({ default: m.AdminBolimlar })));
+const AdminSMS = lazy(() => import('./pages/admin/AdminSMS').then(m => ({ default: m.AdminSMS })));
 
 // Loading spinner
 function PageLoader() {
@@ -64,6 +65,7 @@ function AppRoutes() {
         <Route path="/admin/darslar" element={<AdminRoute><AdminDarslar /></AdminRoute>} />
         <Route path="/admin/darslar/:categoryId" element={<AdminRoute><AdminDarslar /></AdminRoute>} />
         <Route path="/admin/foydalanuvchilar" element={<AdminRoute><AdminFoydalanuvchilar /></AdminRoute>} />
+        <Route path="/admin/sms" element={<AdminRoute><AdminSMS /></AdminRoute>} />
       </Routes>
     </Suspense>
   );

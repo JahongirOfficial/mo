@@ -112,6 +112,7 @@ export function AdminDarslar() {
           <Link to="/admin/kategoriyalar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2"><span className="material-symbols-outlined">category</span>Kategoriyalar</Link>
           <Link to="/admin/darslar" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800 text-white mb-2"><span className="material-symbols-outlined">school</span>Darslar</Link>
           <Link to="/admin/foydalanuvchilar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2"><span className="material-symbols-outlined">group</span>Foydalanuvchilar</Link>
+          <Link to="/admin/sms" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2"><span className="material-symbols-outlined">sms</span>SMS Xabarnoma</Link>
         </nav>
         <div className="p-4 border-t border-slate-800">
           <Link to="/bolim" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"><span className="material-symbols-outlined">arrow_back</span>Saytga qaytish</Link>
