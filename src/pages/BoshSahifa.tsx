@@ -375,6 +375,14 @@ export function BoshSahifa() {
           <div className="border-t border-slate-800 pt-6 sm:pt-8 text-center text-slate-500 text-xs sm:text-sm">
             <p>© 2024 Mukammal Ota Ona</p>
           </div>
+          
+          {/* SEO - Kirill alifbosi uchun yashirin matn (Google indekslashi uchun) */}
+          <div className="sr-only" aria-hidden="true">
+            <h2>Мукаммал Ота Она - Фарзанд тарбияси платформаси</h2>
+            <p>Буюк болалар ортидаги буюк ОТА-ОНА бўлинг! 150+ видео дарслар, профессионал психологлар маслаҳати ва 24/7 қўллаб-қувватлаш. Ўзбекистондаги #1 тарбиявий платформа.</p>
+            <p>Бола тарбияси, ота она маслаҳатлари, болалар психологияси, оилавий муносабатлар, ўсмир тарбияси, фарзанд тарбияси сирлари.</p>
+            <p>6-18 ёш учун умумий муаммолар, 6-9 ёш муаммолари, 10-12 ёш муаммолари, 13-15 ёш муаммолари, 16-18 ёш муаммолари.</p>
+          </div>
         </div>
       </footer>
     </div>

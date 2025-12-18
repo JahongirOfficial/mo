@@ -51,16 +51,19 @@ export function KategoriyaBolimi() {
     loadSection();
     const completed = JSON.parse(localStorage.getItem('completedLessons') || '[]');
     setCompletedLessons(completed);
-  }, [id, isAdmin]);
+  }, [id]);
 
   const loadSection = async () => {
     try {
-      const allSectionsRes = await sectionsAPI.getAll();
-      const allSections = allSectionsRes.data.sort((a: Section, b: Section) => (a.orderIndex || 0) - (b.orderIndex || 0));
-      const currentIndex = allSections.findIndex((s: Section) => s.id === id);
-      const currentSection = allSections[currentIndex];
+      // Bitta so'rov bilan section va uning kategoriyalarini olish
+      const res = await sectionsAPI.getOne(id!);
       
-      if (!isAdmin && currentSection?.status === 'pause') {
+      // Agar pause bo'lsa va admin bo'lmasa, tekshirish
+      if (!isAdmin && res.data.status === 'pause') {
+        // Oldingi bo'lim nomini olish uchun barcha bo'limlarni so'rash
+        const allSectionsRes = await sectionsAPI.getAll();
+        const allSections = allSectionsRes.data.sort((a: Section, b: Section) => (a.orderIndex || 0) - (b.orderIndex || 0));
+        const currentIndex = allSections.findIndex((s: Section) => s.id === id);
         const prevSection = allSections[currentIndex - 1];
         setPausedSectionName(prevSection?.name || 'oldingi bo\'lim');
         setAccessDenied(true);
@@ -68,11 +71,8 @@ export function KategoriyaBolimi() {
         return;
       }
       
-      const res = await sectionsAPI.getOne(id!);
-      console.log(`📂 Bo'lim ochildi: "${res.data.name}" | Status: ${res.data.status || 'active'} | isAdmin: ${isAdmin}`);
       setSection(res.data);
     } catch (err: any) {
-      console.error(err);
       navigate('/bolim');
     } finally {
       setLoading(false);
@@ -223,7 +223,6 @@ export function KategoriyaBolimi() {
               const sortedCategories = [...section.categories].sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
               const prevCategory = sortedCategories[catIndex - 1];
               const isPaused = !isAdmin && category.status === 'pause';
-              console.log(`📁 Kategoriya: "${category.name}" | Status: ${category.status || 'undefined'} | isPaused: ${isPaused}`);
 
               const handleCategoryClick = () => {
                 if (isPaused) {

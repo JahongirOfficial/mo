@@ -37,10 +37,10 @@ app.use('/api/users', authenticateToken, userRoutes);
 app.use('/api/upload', authenticateToken, uploadRoutes);
 
 // Secure video streaming - only for subscribed users
-app.use('/api/videos', authenticateToken, checkSubscription, (req, res, next) => {
+app.use('/api/videos', authenticateToken, checkSubscription, (req, res) => {
   const videoPath = path.join(__dirname, '../uploads', req.path);
   res.sendFile(videoPath, (err) => {
-    if (err) {
+    if (err && !res.headersSent) {
       res.status(404).json({ error: 'Video topilmadi' });
     }
   });
