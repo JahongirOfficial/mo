@@ -15,6 +15,7 @@ import uploadRoutes from './routes/upload';
 import sectionRoutes from './routes/sections';
 import leadRoutes from './routes/leads';
 import aiRoutes from './routes/ai';
+import clientRoutes from './routes/clients';
 import { authenticateToken, checkSubscription } from './middleware/auth';
 
 const app = express();
@@ -29,6 +30,7 @@ connectDB();
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/leads', leadRoutes); // Public - no auth required
+app.use('/api/clients', clientRoutes); // External API with X-API-Key
 
 // Public sections endpoint (for landing page)
 app.get('/api/sections/public', async (req, res) => {
