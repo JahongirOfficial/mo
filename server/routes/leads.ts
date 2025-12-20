@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import axios from 'axios';
+import { exec } from 'child_process';
 
 const router = Router();
 
-// Send lead to CRM
+// Send lead to CRM using curl
 const sendToCRM = async (fullName: string, phone: string) => {
   const CRM_API_URL = process.env.CRM_API_URL;
   const CRM_API_KEY = process.env.CRM_API_KEY;
@@ -13,24 +14,25 @@ const sendToCRM = async (fullName: string, phone: string) => {
     return false;
   }
 
-  try {
-    const response = await axios.post(CRM_API_URL, {
-      name: fullName,
-      phone: phone.replace(/\s/g, ''),
-      notes: 'Landing page orqali'
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': CRM_API_KEY
-      },
-      timeout: 5000
+  const cleanPhone = phone.replace(/\s/g, '');
+  
+  // JSON ni to'g'ri escape qilish
+  const escapedName = fullName.replace(/"/g, '\\"');
+  const escapedPhone = cleanPhone.replace(/"/g, '\\"');
+  
+  const curlCommand = `curl -X POST "${CRM_API_URL}" -H "Content-Type: application/json" -H "X-API-Key: ${CRM_API_KEY}" -d "{\\"name\\":\\"${escapedName}\\",\\"phone\\":\\"${escapedPhone}\\",\\"notes\\":\\"Landing page orqali\\"}" --max-time 10`;
+
+  return new Promise((resolve) => {
+    exec(curlCommand, (error, stdout, stderr) => {
+      if (error) {
+        console.error('CRM curl xatosi:', error.message);
+        resolve(false);
+      } else {
+        console.log('CRM ga yuborildi (curl):', stdout);
+        resolve(true);
+      }
     });
-    console.log('CRM ga yuborildi:', response.data);
-    return true;
-  } catch (error: any) {
-    console.error('CRM xatosi:', error.response?.data || error.message);
-    return false;
-  }
+  });
 };
 
 // Send lead to Telegram and CRM
