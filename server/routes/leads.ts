@@ -5,7 +5,7 @@ const router = Router();
 
 // CRM API configuration
 const CRM_API_URL = 'https://crm.mukammalotaona.uz/api/clients';
-const CRM_API_KEY = 'crm_7NqtZaqukkC252TKqhRz8t4JTGveLDnM';
+const CRM_API_KEY = 'crm_MPaPMQ9MS3e3uM4WtxDDJHNqsmm9848r';
 
 // Send lead to CRM
 const sendToCRM = async (fullName: string, phone: string) => {
