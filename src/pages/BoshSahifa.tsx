@@ -138,9 +138,11 @@ export function BoshSahifa() {
                 <span className="material-symbols-outlined text-lg">verified</span>
                 #1-raqamli tarbiyaviy platforma
               </div>
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-slate-900 mb-4 sm:mb-6" style={{ lineHeight: '1.2' }}>
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-slate-900 mb-4 sm:mb-6" style={{ lineHeight: '1.3' }}>
                 Birgalikda farzandingizni
-                <span className="bg-gradient-to-r from-emerald-500 to-emerald-600 bg-clip-text text-transparent"> DUNYO</span>ga olib chiqamiz
+                <span className="bg-gradient-to-r from-emerald-500 to-emerald-600 bg-clip-text text-transparent"> DUNYO</span>ga
+                <br />
+                olib chiqamiz
               </h1>
               <p className="text-sm sm:text-lg lg:text-xl text-slate-600 mb-6 sm:mb-8 max-w-xl mx-auto lg:mx-0">
                 Buyuk bolalar ortidagi buyuk OTA-ONA bo'ling!
