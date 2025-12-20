@@ -3,7 +3,32 @@ import axios from 'axios';
 
 const router = Router();
 
-// Send lead to Telegram
+// CRM API configuration
+const CRM_API_URL = 'https://crm.mukammalotaona.uz/api/clients';
+const CRM_API_KEY = 'crm_7NqtZaqukkC252TKqhRz8t4JTGveLDnM';
+
+// Send lead to CRM
+const sendToCRM = async (fullName: string, phone: string) => {
+  try {
+    const response = await axios.post(CRM_API_URL, {
+      name: fullName,
+      phone: phone.replace(/\s/g, ''),
+      notes: 'Landing page orqali'
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': CRM_API_KEY
+      }
+    });
+    console.log('CRM ga yuborildi:', response.data);
+    return true;
+  } catch (error: any) {
+    console.error('CRM xatosi:', error.response?.data || error.message);
+    return false;
+  }
+};
+
+// Send lead to Telegram and CRM
 router.post('/', async (req, res) => {
   try {
     const { fullName, phone } = req.body;
@@ -12,12 +37,14 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: "Ism va telefon raqam kiritilishi shart" });
     }
 
+    // CRM ga yuborish
+    sendToCRM(fullName, phone);
+
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const adminId = process.env.TELEGRAM_ADMIN_ID;
 
     if (!botToken || !adminId) {
       console.error('Telegram bot token yoki admin ID topilmadi');
-      // Telegram sozlanmagan bo'lsa ham success qaytaramiz
       return res.json({ success: true, message: "Ma'lumot qabul qilindi" });
     }
 
@@ -31,7 +58,6 @@ router.post('/', async (req, res) => {
       console.log('Telegram ga yuborildi:', fullName, phone);
     } catch (telegramError: any) {
       console.error('Telegram xatosi:', telegramError.response?.data || telegramError.message);
-      // Telegram xatosi bo'lsa ham foydalanuvchiga success qaytaramiz
     }
 
     res.json({ success: true, message: "Ma'lumot yuborildi" });
