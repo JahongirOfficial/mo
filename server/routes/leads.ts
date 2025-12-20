@@ -3,12 +3,16 @@ import axios from 'axios';
 
 const router = Router();
 
-// CRM API configuration
-const CRM_API_URL = 'https://crm.mukammalotaona.uz/api/clients';
-const CRM_API_KEY = 'crm_MPaPMQ9MS3e3uM4WtxDDJHNqsmm9848r';
-
 // Send lead to CRM
 const sendToCRM = async (fullName: string, phone: string) => {
+  const CRM_API_URL = process.env.CRM_API_URL;
+  const CRM_API_KEY = process.env.CRM_API_KEY;
+
+  if (!CRM_API_URL || !CRM_API_KEY) {
+    console.log('CRM sozlanmagan');
+    return false;
+  }
+
   try {
     const response = await axios.post(CRM_API_URL, {
       name: fullName,
@@ -18,7 +22,8 @@ const sendToCRM = async (fullName: string, phone: string) => {
       headers: {
         'Content-Type': 'application/json',
         'X-API-Key': CRM_API_KEY
-      }
+      },
+      timeout: 5000
     });
     console.log('CRM ga yuborildi:', response.data);
     return true;
