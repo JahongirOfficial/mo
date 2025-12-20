@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-import { connectDB } from './db';
+import { connectDB, Section, Category } from './db';
 import authRoutes from './routes/auth';
 import categoryRoutes from './routes/categories';
 import lessonRoutes from './routes/lessons';
@@ -29,6 +29,29 @@ connectDB();
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/leads', leadRoutes); // Public - no auth required
+
+// Public sections endpoint (for landing page)
+app.get('/api/sections/public', async (req, res) => {
+  try {
+    const sections = await Section.find().sort({ orderIndex: 1 });
+    const sectionsWithCount = await Promise.all(
+      sections.map(async (section) => {
+        const categoryCount = await Category.countDocuments({ sectionId: section._id });
+        return {
+          id: section._id,
+          name: section.name,
+          icon: section.icon,
+          color: section.color,
+          categoryCount
+        };
+      })
+    );
+    res.json(sectionsWithCount);
+  } catch (error) {
+    res.status(500).json({ error: "Bo'limlarni olishda xatolik" });
+  }
+});
+
 app.use('/api/ai', authenticateToken, aiRoutes);
 app.use('/api/sections', authenticateToken, sectionRoutes);
 app.use('/api/categories', authenticateToken, categoryRoutes);

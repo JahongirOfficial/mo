@@ -10,8 +10,12 @@ export function BoshSahifa() {
   const [leadForm, setLeadForm] = useState({ fullName: '', phone: '+998 ' });
   const [leadSending, setLeadSending] = useState(false);
   const [leadSent, setLeadSent] = useState(false);
+  const [sections, setSections] = useState<any[]>([]);
 
   useEffect(() => {
+    // Bo'limlarni yuklash
+    loadSections();
+    
     // Token bo'lmasa 1 soniyadan keyin modal ochilsin
     const token = localStorage.getItem('token');
     const leadSubmitted = localStorage.getItem('leadSubmitted');
@@ -23,6 +27,18 @@ export function BoshSahifa() {
       return () => clearTimeout(timer);
     }
   }, []);
+
+  const loadSections = async () => {
+    try {
+      const res = await fetch(`${API_URL}/sections/public`);
+      if (res.ok) {
+        const data = await res.json();
+        setSections(data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,19 +90,10 @@ export function BoshSahifa() {
     { icon: 'groups', title: 'Mukammal ota-onalar jamoasi', desc: 'Tajriba almashish', color: 'from-emerald-500 to-emerald-600' },
   ];
 
-  const categories = [
-    { icon: 'family_restroom', title: '6-18 yosh uchun UMUMIY muammolar', desc: 'Barcha yoshdagi bolalar uchun', lessons: 20, color: 'bg-emerald-700' },
-    { icon: 'child_care', title: '6-9 yosh muammolari', desc: 'Kichik maktab yoshi', lessons: 12, color: 'bg-emerald-600' },
-    { icon: 'school', title: '10-12 yosh muammolari', desc: 'O\'rta maktab yoshi', lessons: 18, color: 'bg-teal-500' },
-    { icon: 'psychology', title: '13-15 yosh muammolari', desc: 'O\'smirlik davri boshlanishi', lessons: 10, color: 'bg-emerald-500' },
-    { icon: 'person', title: '16-18 yosh muammolari', desc: 'Katta o\'smirlik davri', lessons: 14, color: 'bg-green-600' },
-    { icon: 'self_improvement', title: 'Ota-ona shaxsiy rivojlanishi', desc: 'O\'z ustingizda ishlash', lessons: 15, color: 'bg-emerald-500' },
-  ];
-
   const testimonials = [
-    { name: 'Malika Karimova', role: "2 farzand onasi", text: "Bu platforma orqali farzandlarim bilan munosabatlarim tubdan o'zgardi. Har bir dars hayotiy va amaliy.", avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
-    { name: 'Azizbek Tursunov', role: "3 farzand otasi", text: "Video darslar juda tushunarli. Endi bolalarim bilan muloqot qilish osonlashdi.", avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    { name: 'Nilufar Rahimova', role: "1 farzand onasi", text: "Psixolog maslahatlari juda foydali. Bolam maktabga qiziqib boradi endi.", avatar: 'https://randomuser.me/api/portraits/women/68.jpg' },
+    { name: 'Malika Karimova', role: "2 farzand onasi", text: "Bu platforma orqali farzandlarim bilan munosabatlarim tubdan o'zgardi. Har bir dars hayotiy va amaliy.", avatar: '/uploads/logo/gr.png' },
+    { name: 'Azizbek Tursunov', role: "3 farzand otasi", text: "Video darslar juda tushunarli. Endi bolalarim bilan muloqot qilish osonlashdi.", avatar: '/uploads/logo/gr.png' },
+    { name: 'Nilufar Rahimova', role: "1 farzand onasi", text: "Psixolog maslahatlari juda foydali. Bolam maktabga qiziqib boradi endi.", avatar: '/uploads/logo/gr.png' },
   ];
 
 
@@ -131,10 +138,9 @@ export function BoshSahifa() {
                 <span className="material-symbols-outlined text-lg">verified</span>
                 #1-raqamli tarbiyaviy platforma
               </div>
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-slate-900 leading-tight mb-4 sm:mb-6">
-                Farzand tarbiyasida 
-                <span className="bg-gradient-to-r from-emerald-500 to-emerald-600 bg-clip-text text-transparent"> ishonchli </span>
-                yordamchingiz
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-slate-900 mb-4 sm:mb-6" style={{ lineHeight: '1.2' }}>
+                Birgalikda farzandingizni
+                <span className="bg-gradient-to-r from-emerald-500 to-emerald-600 bg-clip-text text-transparent"> DUNYO</span>ga olib chiqamiz
               </h1>
               <p className="text-sm sm:text-lg lg:text-xl text-slate-600 mb-6 sm:mb-8 max-w-xl mx-auto lg:mx-0">
                 Buyuk bolalar ortidagi buyuk OTA-ONA bo'ling!
@@ -173,21 +179,40 @@ export function BoshSahifa() {
             <p className="text-sm sm:text-lg text-slate-600 max-w-2xl mx-auto">Farzandingiz yoshiga mos darslarni tanlang</p>
           </div>
           
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
-            {categories.map((cat, i) => (
-              <div key={i} className="group relative bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-sm hover:shadow-2xl transition-all duration-300 border border-slate-100 overflow-hidden">
-                <div className={`absolute top-0 right-0 w-20 sm:w-32 h-20 sm:h-32 ${cat.color} opacity-10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500`}></div>
-                <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl ${cat.color} flex items-center justify-center text-white mb-3 sm:mb-5 shadow-lg`}>
-                  <span className="material-symbols-outlined text-lg sm:text-2xl">{cat.icon}</span>
+          <div className={`grid gap-3 sm:gap-6 lg:gap-8 ${sections.length === 5 ? 'grid-cols-2 lg:grid-cols-6' : 'grid-cols-2 lg:grid-cols-3'}`}>
+            {sections.length > 0 ? sections.map((section, i) => {
+              // 5 ta bo'lganda: birinchi 3 tasi 2 col, oxirgi 2 tasi 3 col
+              const colSpan = sections.length === 5 
+                ? (i < 3 ? 'lg:col-span-2' : 'lg:col-span-3') 
+                : '';
+              
+              return (
+                <div 
+                  key={section.id || i} 
+                  className={`group relative bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-sm hover:shadow-2xl transition-all duration-300 border border-slate-100 overflow-hidden ${colSpan}`}
+                >
+                  <div className={`absolute top-0 right-0 w-20 sm:w-32 h-20 sm:h-32 bg-emerald-500 opacity-10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500`}></div>
+                  <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br ${section.color || 'from-emerald-500 to-emerald-600'} flex items-center justify-center text-white mb-3 sm:mb-5 shadow-lg`}>
+                    <span className="material-symbols-outlined text-lg sm:text-2xl">{section.icon || 'folder'}</span>
+                  </div>
+                  <h3 className="text-sm sm:text-xl font-bold text-slate-900 mb-1 sm:mb-2">{section.name}</h3>
+                  <p className="text-slate-600 mb-2 sm:mb-4 text-xs sm:text-base line-clamp-2">{section.categoryCount || 0} ta kategoriya</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs sm:text-sm text-slate-500">{section.categoryCount || 0} ta kategoriya</span>
+                    <span className="material-symbols-outlined text-primary group-hover:translate-x-2 transition-transform text-lg sm:text-2xl">arrow_forward</span>
+                  </div>
                 </div>
-                <h3 className="text-sm sm:text-xl font-bold text-slate-900 mb-1 sm:mb-2">{cat.title}</h3>
-                <p className="text-slate-600 mb-2 sm:mb-4 text-xs sm:text-base line-clamp-2">{cat.desc}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs sm:text-sm text-slate-500">{cat.lessons} ta dars</span>
-                  <span className="material-symbols-outlined text-primary group-hover:translate-x-2 transition-transform text-lg sm:text-2xl">arrow_forward</span>
+              );
+            }) : (
+              // Skeleton loader
+              [...Array(6)].map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-sm border border-slate-100 animate-pulse">
+                  <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-slate-200 mb-3 sm:mb-5"></div>
+                  <div className="h-4 sm:h-6 bg-slate-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-3 sm:h-4 bg-slate-100 rounded w-1/2"></div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
           
           <div className="text-center mt-8 sm:mt-12">
