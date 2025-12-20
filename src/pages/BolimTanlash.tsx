@@ -77,7 +77,7 @@ export function BolimTanlash() {
           <div className="absolute bottom-0 left-0 w-32 sm:w-48 h-32 sm:h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
           <div className="relative z-10">
             <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3">Xush kelibsiz, {user?.fullName?.split(' ')[0]}! 👋</h1>
-            <p className="text-emerald-100 text-sm sm:text-lg max-w-2xl">Farzandingiz yoshi yoki o'zingiz uchun kerakli bo'limni tanlang</p>
+            <p className="text-emerald-100 text-sm sm:text-lg max-w-2xl">Farzandlaringizni dunyo darajasiga olib chiqamiz</p>
           </div>
         </div>
 
