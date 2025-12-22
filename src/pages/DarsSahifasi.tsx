@@ -201,6 +201,7 @@ export function DarsSahifasi() {
                 controls 
                 className="w-full h-full" 
                 controlsList="nodownload" 
+                preload="metadata"
                 onContextMenu={(e) => e.preventDefault()}
                 src={getVideoUrl(lesson.videoUrl)}
               >

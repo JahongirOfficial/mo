@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -61,14 +62,58 @@ app.use('/api/lessons', authenticateToken, checkSubscription, lessonRoutes);
 app.use('/api/users', authenticateToken, userRoutes);
 app.use('/api/upload', authenticateToken, uploadRoutes);
 
-// Secure video streaming - only for subscribed users
+// Secure video streaming with Range Request support
 app.use('/api/videos', authenticateToken, checkSubscription, (req, res) => {
   const videoPath = path.join(__dirname, '../uploads', req.path);
-  res.sendFile(videoPath, (err) => {
-    if (err && !res.headersSent) {
-      res.status(404).json({ error: 'Video topilmadi' });
-    }
-  });
+  
+  // Fayl mavjudligini tekshirish
+  if (!fs.existsSync(videoPath)) {
+    return res.status(404).json({ error: 'Video topilmadi' });
+  }
+
+  const stat = fs.statSync(videoPath);
+  const fileSize = stat.size;
+  const range = req.headers.range;
+
+  // Video MIME type
+  const ext = path.extname(videoPath).toLowerCase();
+  const mimeTypes: { [key: string]: string } = {
+    '.mp4': 'video/mp4',
+    '.webm': 'video/webm',
+    '.ogg': 'video/ogg',
+    '.mov': 'video/quicktime'
+  };
+  const contentType = mimeTypes[ext] || 'video/mp4';
+
+  if (range) {
+    // Range Request - partial content
+    const parts = range.replace(/bytes=/, '').split('-');
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+    const chunkSize = end - start + 1;
+
+    const file = fs.createReadStream(videoPath, { start, end });
+
+    res.writeHead(206, {
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunkSize,
+      'Content-Type': contentType,
+      'Cache-Control': 'public, max-age=3600'
+    });
+
+    file.pipe(res);
+  } else {
+    // No range - full file
+    res.writeHead(200, {
+      'Content-Length': fileSize,
+      'Content-Type': contentType,
+      'Accept-Ranges': 'bytes',
+      'Cache-Control': 'public, max-age=3600'
+    });
+
+    fs.createReadStream(videoPath).pipe(res);
+  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
