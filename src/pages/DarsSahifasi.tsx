@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { lessonsAPI } from '../api';
 import { useAuth } from '../context/AuthContext';
@@ -22,6 +22,8 @@ export function DarsSahifasi() {
   const [showShareToast, setShowShareToast] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [openSection, setOpenSection] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [bufferStatus, setBufferStatus] = useState<string>('');
 
   useEffect(() => { loadLesson(); window.scrollTo(0, 0); }, [id]);
 
@@ -108,6 +110,59 @@ export function DarsSahifasi() {
     const apiPath = videoUrl.startsWith('/api') ? videoUrl : `/api${videoUrl}`;
     return `${apiPath}?token=${token}`;
   };
+
+  // Video buffering - 5 soniya oldindan yuklash
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const BUFFER_AHEAD = 5; // 5 soniya oldindan yuklash
+
+    const checkBuffer = () => {
+      if (!video.buffered.length) return;
+      
+      const currentTime = video.currentTime;
+      const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+      const bufferAhead = bufferedEnd - currentTime;
+      
+      // Buffer holatini ko'rsatish (debug uchun)
+      if (bufferAhead < BUFFER_AHEAD && !video.paused) {
+        setBufferStatus(`Yuklanmoqda... ${Math.round(bufferAhead)}s`);
+      } else {
+        setBufferStatus('');
+      }
+    };
+
+    const handleProgress = () => checkBuffer();
+    const handleTimeUpdate = () => checkBuffer();
+    
+    // Video to'liq yuklanganda cache'ga saqlash
+    const handleCanPlayThrough = () => {
+      setBufferStatus('');
+    };
+
+    const handleWaiting = () => {
+      setBufferStatus('Yuklanmoqda...');
+    };
+
+    const handlePlaying = () => {
+      setBufferStatus('');
+    };
+
+    video.addEventListener('progress', handleProgress);
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('canplaythrough', handleCanPlayThrough);
+    video.addEventListener('waiting', handleWaiting);
+    video.addEventListener('playing', handlePlaying);
+
+    return () => {
+      video.removeEventListener('progress', handleProgress);
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('canplaythrough', handleCanPlayThrough);
+      video.removeEventListener('waiting', handleWaiting);
+      video.removeEventListener('playing', handlePlaying);
+    };
+  }, [lesson?.id]);
 
   const loadLesson = async () => {
     setLoading(true);
@@ -197,16 +252,24 @@ export function DarsSahifasi() {
           {lesson.type === 'video' && lesson.videoUrl && (
             <div className="relative bg-black aspect-video">
               <video 
+                ref={videoRef}
                 key={lesson.id}
                 controls 
                 className="w-full h-full" 
                 controlsList="nodownload" 
-                preload="metadata"
+                preload="auto"
                 onContextMenu={(e) => e.preventDefault()}
                 src={getVideoUrl(lesson.videoUrl)}
               >
                 Brauzeringiz video formatini qo'llab-quvvatlamaydi.
               </video>
+              {/* Buffer status indicator */}
+              {bufferStatus && (
+                <div className="absolute top-4 right-4 px-3 py-1.5 bg-black/70 text-white text-xs rounded-lg flex items-center gap-2">
+                  <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  {bufferStatus}
+                </div>
+              )}
             </div>
           )}
 
