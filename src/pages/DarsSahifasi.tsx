@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 interface Lesson {
   id: string; title: string; content: string; duration: string; type: string;
   categoryId: string; categoryName: string; videoUrl?: string;
-  tushuncha?: string; misol?: string; amaliy?: string;
+  savollar?: string; xulosa?: string;
   prevLesson: { id: string; title: string } | null;
   nextLesson: { id: string; title: string } | null;
 }
@@ -20,39 +20,11 @@ export function DarsSahifasi() {
   const [subscriptionError, setSubscriptionError] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showShareToast, setShowShareToast] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(false);
   const [openSection, setOpenSection] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [bufferStatus, setBufferStatus] = useState<string>('');
 
   useEffect(() => { loadLesson(); window.scrollTo(0, 0); }, [id]);
-
-  // Check if lesson is completed
-  useEffect(() => {
-    if (id) {
-      const completed = JSON.parse(localStorage.getItem('completedLessons') || '[]');
-      setIsCompleted(completed.includes(id));
-    }
-  }, [id]);
-
-  // Mark lesson as completed and go to next
-  const handleComplete = () => {
-    if (!id || !lesson) return;
-    
-    const completed = JSON.parse(localStorage.getItem('completedLessons') || '[]');
-    if (!completed.includes(id)) {
-      completed.push(id);
-      localStorage.setItem('completedLessons', JSON.stringify(completed));
-      setIsCompleted(true);
-    }
-    
-    // Navigate to next lesson or category
-    if (lesson.nextLesson) {
-      navigate(`/dars/${lesson.nextLesson.id}`);
-    } else {
-      navigate(`/bolim`);
-    }
-  };
 
   // Check bookmark status
   useEffect(() => {
@@ -256,7 +228,8 @@ export function DarsSahifasi() {
                 key={lesson.id}
                 controls 
                 className="w-full h-full" 
-                controlsList="nodownload" 
+                controlsList="nodownload noplaybackrate" 
+                disablePictureInPicture
                 preload="auto"
                 onContextMenu={(e) => e.preventDefault()}
                 src={getVideoUrl(lesson.videoUrl)}
@@ -274,72 +247,49 @@ export function DarsSahifasi() {
           )}
 
           {/* Accordion Sections */}
-          {lesson.type === 'video' && (lesson.tushuncha || lesson.misol || lesson.amaliy) && (
+          {lesson.type === 'video' && (lesson.savollar || lesson.xulosa) && (
             <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 space-y-3">
-              {/* Ota-onaga tushuncha */}
-              {lesson.tushuncha && (
+              {/* Savollar */}
+              {lesson.savollar && (
                 <div className="border border-slate-200 rounded-xl overflow-hidden">
                   <button
-                    onClick={() => setOpenSection(openSection === 'tushuncha' ? null : 'tushuncha')}
-                    className={`w-full flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 transition-colors ${openSection === 'tushuncha' ? 'bg-emerald-50' : 'bg-slate-50 hover:bg-slate-100'}`}
+                    onClick={() => setOpenSection(openSection === 'savollar' ? null : 'savollar')}
+                    className={`w-full flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 transition-colors ${openSection === 'savollar' ? 'bg-emerald-50' : 'bg-slate-50 hover:bg-slate-100'}`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${openSection === 'tushuncha' ? 'bg-emerald-500 text-white' : 'bg-emerald-100 text-emerald-600'}`}>
-                        <span className="material-symbols-outlined text-lg sm:text-xl">psychology</span>
+                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${openSection === 'savollar' ? 'bg-emerald-500 text-white' : 'bg-emerald-100 text-emerald-600'}`}>
+                        <span className="material-symbols-outlined text-lg sm:text-xl">help</span>
                       </div>
-                      <span className="font-semibold text-slate-800 text-sm sm:text-base">Ota-onaga tushuncha</span>
+                      <span className="font-semibold text-slate-800 text-sm sm:text-base">Savollar</span>
                     </div>
-                    <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'tushuncha' ? 'rotate-180' : ''}`}>expand_more</span>
+                    <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'savollar' ? 'rotate-180' : ''}`}>expand_more</span>
                   </button>
-                  {openSection === 'tushuncha' && (
+                  {openSection === 'savollar' && (
                     <div className="px-4 sm:px-5 py-4 sm:py-5 bg-white border-t border-slate-100">
-                      <p className="text-slate-700 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{lesson.tushuncha}</p>
+                      <p className="text-slate-700 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{lesson.savollar}</p>
                     </div>
                   )}
                 </div>
               )}
 
-              {/* Hayotiy misol */}
-              {lesson.misol && (
+              {/* Xulosa */}
+              {lesson.xulosa && (
                 <div className="border border-slate-200 rounded-xl overflow-hidden">
                   <button
-                    onClick={() => setOpenSection(openSection === 'misol' ? null : 'misol')}
-                    className={`w-full flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 transition-colors ${openSection === 'misol' ? 'bg-amber-50' : 'bg-slate-50 hover:bg-slate-100'}`}
+                    onClick={() => setOpenSection(openSection === 'xulosa' ? null : 'xulosa')}
+                    className={`w-full flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 transition-colors ${openSection === 'xulosa' ? 'bg-amber-50' : 'bg-slate-50 hover:bg-slate-100'}`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${openSection === 'misol' ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-600'}`}>
-                        <span className="material-symbols-outlined text-lg sm:text-xl">auto_stories</span>
+                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${openSection === 'xulosa' ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-600'}`}>
+                        <span className="material-symbols-outlined text-lg sm:text-xl">lightbulb</span>
                       </div>
-                      <span className="font-semibold text-slate-800 text-sm sm:text-base">Hayotiy misol</span>
+                      <span className="font-semibold text-slate-800 text-sm sm:text-base">Xulosa</span>
                     </div>
-                    <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'misol' ? 'rotate-180' : ''}`}>expand_more</span>
+                    <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'xulosa' ? 'rotate-180' : ''}`}>expand_more</span>
                   </button>
-                  {openSection === 'misol' && (
+                  {openSection === 'xulosa' && (
                     <div className="px-4 sm:px-5 py-4 sm:py-5 bg-white border-t border-slate-100">
-                      <p className="text-slate-700 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{lesson.misol}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Amaliy mashq */}
-              {lesson.amaliy && (
-                <div className="border border-slate-200 rounded-xl overflow-hidden">
-                  <button
-                    onClick={() => setOpenSection(openSection === 'amaliy' ? null : 'amaliy')}
-                    className={`w-full flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 transition-colors ${openSection === 'amaliy' ? 'bg-sky-50' : 'bg-slate-50 hover:bg-slate-100'}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${openSection === 'amaliy' ? 'bg-sky-500 text-white' : 'bg-sky-100 text-sky-600'}`}>
-                        <span className="material-symbols-outlined text-lg sm:text-xl">fitness_center</span>
-                      </div>
-                      <span className="font-semibold text-slate-800 text-sm sm:text-base">Amaliy mashq</span>
-                    </div>
-                    <span className={`material-symbols-outlined text-slate-400 transition-transform ${openSection === 'amaliy' ? 'rotate-180' : ''}`}>expand_more</span>
-                  </button>
-                  {openSection === 'amaliy' && (
-                    <div className="px-4 sm:px-5 py-4 sm:py-5 bg-white border-t border-slate-100">
-                      <p className="text-slate-700 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{lesson.amaliy}</p>
+                      <p className="text-slate-700 leading-relaxed text-sm sm:text-base whitespace-pre-wrap">{lesson.xulosa}</p>
                     </div>
                   )}
                 </div>
@@ -393,21 +343,6 @@ export function DarsSahifasi() {
             </div>
           )}
         </article>
-
-        {/* Complete Button */}
-        <button
-          onClick={handleComplete}
-          className={`w-full mt-4 sm:mt-6 py-4 sm:py-5 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg flex items-center justify-center gap-3 transition-all ${
-            isCompleted 
-              ? 'bg-emerald-100 text-emerald-700' 
-              : 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg hover:shadow-xl'
-          }`}
-        >
-          <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: isCompleted ? "'FILL' 1" : "'FILL' 0" }}>
-            {isCompleted ? 'check_circle' : 'task_alt'}
-          </span>
-          {isCompleted ? 'Amalda bajardim ✓' : 'Amalda bajardim'}
-        </button>
 
         {/* Navigation */}
         {lesson.prevLesson && (

@@ -70,13 +70,15 @@ export function AiChat() {
         )}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`relative w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
-            isOpen ? 'bg-slate-600 rotate-90' : 'bg-sky-500 hover:bg-sky-600 hover:scale-110'
+          className={`relative w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 overflow-hidden ${
+            isOpen ? 'bg-slate-600 rotate-90' : 'hover:scale-110'
           }`}
         >
-          <span className="material-symbols-outlined text-white text-3xl">
-            {isOpen ? 'close' : 'support_agent'}
-          </span>
+          {isOpen ? (
+            <span className="material-symbols-outlined text-white text-3xl">close</span>
+          ) : (
+            <img src="/uploads/ai.jpg" alt="AI" className="w-full h-full object-cover" />
+          )}
         </button>
       </div>
 
@@ -85,8 +87,8 @@ export function AiChat() {
         <div className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-fade-in">
           {/* Header */}
           <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-3 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <span className="material-symbols-outlined text-white">support_agent</span>
+            <div className="w-10 h-10 rounded-full overflow-hidden">
+              <img src="/uploads/ai.jpg" alt="AI" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1">
               <h3 className="font-bold text-white text-sm">AI Yordamchi</h3>

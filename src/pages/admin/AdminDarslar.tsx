@@ -6,7 +6,7 @@ interface Category { id: string; name: string; }
 interface Lesson {
   id: string; title: string; content: string; duration: string;
   type: string; categoryId: string; categoryName?: string; orderIndex: number; videoUrl?: string;
-  tushuncha?: string; misol?: string; amaliy?: string;
+  savollar?: string; xulosa?: string;
 }
 
 export function AdminDarslar() {
@@ -18,7 +18,7 @@ export function AdminDarslar() {
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryId || '');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ categoryId: '', title: '', content: '', duration: '5 daqiqa', type: 'article', videoUrl: '', tushuncha: '', misol: '', amaliy: '' });
+  const [form, setForm] = useState({ categoryId: '', title: '', content: '', duration: '5 daqiqa', type: 'article', videoUrl: '', savollar: '', xulosa: '' });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -42,10 +42,10 @@ export function AdminDarslar() {
   const openModal = (lesson?: Lesson) => {
     if (lesson) {
       setEditingId(lesson.id);
-      setForm({ categoryId: lesson.categoryId, title: lesson.title, content: lesson.content || '', duration: lesson.duration, type: lesson.type, videoUrl: lesson.videoUrl || '', tushuncha: lesson.tushuncha || '', misol: lesson.misol || '', amaliy: lesson.amaliy || '' });
+      setForm({ categoryId: lesson.categoryId, title: lesson.title, content: lesson.content || '', duration: lesson.duration, type: lesson.type, videoUrl: lesson.videoUrl || '', savollar: lesson.savollar || '', xulosa: lesson.xulosa || '' });
     } else {
       setEditingId(null);
-      setForm({ categoryId: selectedCategory || categories[0]?.id || '', title: '', content: '', duration: '5 daqiqa', type: 'article', videoUrl: '', tushuncha: '', misol: '', amaliy: '' });
+      setForm({ categoryId: selectedCategory || categories[0]?.id || '', title: '', content: '', duration: '5 daqiqa', type: 'article', videoUrl: '', savollar: '', xulosa: '' });
     }
     setShowModal(true);
   };
@@ -266,18 +266,13 @@ export function AdminDarslar() {
               )}
               
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Ota-onaga tushuncha</label>
-                <textarea value={form.tushuncha} onChange={(e) => setForm({ ...form, tushuncha: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-primary outline-none text-sm resize-none" placeholder="Ota-onalar uchun tushuncha..." rows={4} />
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Savollar</label>
+                <textarea value={form.savollar} onChange={(e) => setForm({ ...form, savollar: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-primary outline-none text-sm resize-none" placeholder="Savollar..." rows={4} />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Hayotiy misol</label>
-                <textarea value={form.misol} onChange={(e) => setForm({ ...form, misol: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-primary outline-none text-sm resize-none" placeholder="Hayotiy misol..." rows={4} />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Amaliy mashq</label>
-                <textarea value={form.amaliy} onChange={(e) => setForm({ ...form, amaliy: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-primary outline-none text-sm resize-none" placeholder="Amaliy mashq..." rows={4} />
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Xulosa</label>
+                <textarea value={form.xulosa} onChange={(e) => setForm({ ...form, xulosa: e.target.value })} className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-primary outline-none text-sm resize-none" placeholder="Xulosa..." rows={4} />
               </div>
               
               <div className="flex gap-3 pt-4">
