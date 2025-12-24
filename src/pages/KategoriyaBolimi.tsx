@@ -285,23 +285,6 @@ export function KategoriyaBolimi() {
                           {lessons.map((lesson, index) => {
                             const type = typeConfig[lesson.type] || typeConfig.article;
                             const isLessonCompleted = completedLessons.includes(lesson.id);
-                            const prevLessonId = index > 0 ? lessons[index - 1].id : null;
-                            const isPrevCompleted = prevLessonId ? completedLessons.includes(prevLessonId) : true;
-                            const isUnlocked = isAdmin || index === 0 || isPrevCompleted;
-                            
-                            if (!isUnlocked) {
-                              return (
-                                <div key={lesson.id} className="flex items-center gap-3 p-3 bg-white/60 rounded-xl opacity-60">
-                                  <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center text-slate-400 font-bold text-sm shrink-0">
-                                    <span className="material-symbols-outlined text-base">lock</span>
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="font-medium text-sm text-slate-400 truncate">{lesson.title}</p>
-                                    <p className="text-xs text-slate-400">Oldingi darsni bajaring</p>
-                                  </div>
-                                </div>
-                              );
-                            }
                             
                             return (
                               <Link key={lesson.id} to={`/dars/${lesson.id}`} className="group flex items-center gap-3 p-3 bg-white rounded-xl hover:shadow-md transition-all">
