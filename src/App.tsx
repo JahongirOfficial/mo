@@ -79,9 +79,10 @@ function AiChatWrapper() {
 }
 
 function PwaBannerWrapper() {
-  const { user } = useAuth();
-  if (!user) return null;
-  return <PwaInstallBanner />;
+  // const { user } = useAuth();
+  // if (!user) return null;
+  // return <PwaInstallBanner />;
+  return null; // Vaqtincha o'chirilgan
 }
 
 function App() {
