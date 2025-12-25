@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Category, Lesson } from '../db';
+import { Category, Lesson, Section } from '../db';
 import { isAdmin, AuthRequest } from '../middleware/auth';
 
 const router = Router();
@@ -16,14 +16,20 @@ router.get('/', async (req, res) => {
 
     const lessons = await Lesson.find(query).sort({ orderIndex: 1 });
     
-    // Get category names
+    // Get category and section names
     const lessonsWithCategory = await Promise.all(
       lessons.map(async (lesson) => {
         const category = await Category.findById(lesson.categoryId);
+        let sectionName = '';
+        if (category?.sectionId) {
+          const section = await Section.findById(category.sectionId);
+          sectionName = section?.name || '';
+        }
         return {
           ...lesson.toObject(),
           id: lesson._id,
-          categoryName: category?.name || ''
+          categoryName: category?.name || '',
+          sectionName
         };
       })
     );

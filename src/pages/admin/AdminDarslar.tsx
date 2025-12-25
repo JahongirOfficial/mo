@@ -5,7 +5,7 @@ import { categoriesAPI, lessonsAPI, uploadAPI } from '../../api';
 interface Category { id: string; name: string; }
 interface Lesson {
   id: string; title: string; content: string; duration: string;
-  type: string; categoryId: string; categoryName?: string; orderIndex: number; videoUrl?: string;
+  type: string; categoryId: string; categoryName?: string; sectionName?: string; orderIndex: number; videoUrl?: string;
   savollar?: string; xulosa?: string;
 }
 
@@ -158,6 +158,7 @@ export function AdminDarslar() {
                 <table className="w-full">
                   <thead><tr className="bg-slate-50 border-b border-slate-100">
                     <th className="text-left px-4 sm:px-6 py-4 font-semibold text-slate-600 text-sm">Dars</th>
+                    <th className="text-left px-4 sm:px-6 py-4 font-semibold text-slate-600 text-sm hidden lg:table-cell">Bo'lim</th>
                     <th className="text-left px-4 sm:px-6 py-4 font-semibold text-slate-600 text-sm hidden md:table-cell">Kategoriya</th>
                     <th className="text-center px-4 sm:px-6 py-4 font-semibold text-slate-600 text-sm hidden sm:table-cell">Turi</th>
                     <th className="text-right px-4 sm:px-6 py-4 font-semibold text-slate-600 text-sm">Amallar</th>
@@ -168,6 +169,7 @@ export function AdminDarslar() {
                       return (
                         <tr key={lesson.id} className="hover:bg-slate-50 transition-colors">
                           <td className="px-4 sm:px-6 py-4"><span className="font-semibold text-slate-900 text-sm">{lesson.title}</span></td>
+                          <td className="px-4 sm:px-6 py-4 text-slate-500 text-sm hidden lg:table-cell">{lesson.sectionName || '-'}</td>
                           <td className="px-4 sm:px-6 py-4 text-slate-500 text-sm hidden md:table-cell">{lesson.categoryName || categories.find(c => c.id === lesson.categoryId)?.name}</td>
                           <td className="px-4 sm:px-6 py-4 text-center hidden sm:table-cell">
                             <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg ${type.color} font-medium text-xs`}>
