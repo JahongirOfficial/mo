@@ -29,6 +29,8 @@ export function AdminBolimlar() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: '', icon: 'folder', color: 'from-emerald-500 to-emerald-600', orderIndex: 0, status: 'active' as 'active' | 'pause' });
   const [saving, setSaving] = useState(false);
+  const [deleteModal, setDeleteModal] = useState<{ show: boolean; section: Section | null }>({ show: false, section: null });
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     loadSections();
@@ -74,14 +76,21 @@ export function AdminBolimlar() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Bo'limni o'chirishni tasdiqlaysizmi?")) return;
+  const handleDelete = async (id: string, keepCategories: boolean) => {
+    setDeleting(true);
     try {
-      await sectionsAPI.delete(id);
+      await sectionsAPI.delete(id, keepCategories);
+      setDeleteModal({ show: false, section: null });
       loadSections();
     } catch (err: any) {
       alert(err.response?.data?.error || "Xatolik yuz berdi");
+    } finally {
+      setDeleting(false);
     }
+  };
+
+  const openDeleteModal = (section: Section) => {
+    setDeleteModal({ show: true, section });
   };
 
   return (
@@ -214,7 +223,7 @@ export function AdminBolimlar() {
                             <button onClick={() => openModal(section)} className="p-2.5 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all">
                               <span className="material-symbols-outlined">edit</span>
                             </button>
-                            <button onClick={() => handleDelete(section.id)} className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                            <button onClick={() => openDeleteModal(section)} className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
                               <span className="material-symbols-outlined">delete</span>
                             </button>
                           </div>
@@ -325,6 +334,55 @@ export function AdminBolimlar() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {deleteModal.show && deleteModal.section && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setDeleteModal({ show: false, section: null })} />
+          <div className="relative bg-white rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl">
+            <div className="text-center mb-5">
+              <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                <span className="material-symbols-outlined text-3xl text-red-600">delete</span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Bo'limni o'chirish</h3>
+              <p className="text-slate-600 text-sm">
+                <strong>"{deleteModal.section.name}"</strong> bo'limini o'chirmoqchimisiz?
+              </p>
+              {deleteModal.section.categoryCount > 0 && (
+                <p className="text-amber-600 text-sm mt-2">
+                  Bu bo'limda <strong>{deleteModal.section.categoryCount} ta</strong> kategoriya bor.
+                </p>
+              )}
+            </div>
+            
+            <div className="space-y-3">
+              {deleteModal.section.categoryCount > 0 && (
+                <button
+                  onClick={() => handleDelete(deleteModal.section!.id, true)}
+                  disabled={deleting}
+                  className="w-full py-3 bg-amber-100 text-amber-700 rounded-xl font-semibold hover:bg-amber-200 transition-colors text-sm disabled:opacity-50"
+                >
+                  {deleting ? 'O\'chirilmoqda...' : 'Kategoriyalarni saqlab qolish'}
+                </button>
+              )}
+              <button
+                onClick={() => handleDelete(deleteModal.section!.id, false)}
+                disabled={deleting}
+                className="w-full py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600 transition-colors text-sm disabled:opacity-50"
+              >
+                {deleting ? 'O\'chirilmoqda...' : deleteModal.section.categoryCount > 0 ? 'Hammasi bilan o\'chirish' : 'O\'chirish'}
+              </button>
+              <button
+                onClick={() => setDeleteModal({ show: false, section: null })}
+                disabled={deleting}
+                className="w-full py-3 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-colors text-sm"
+              >
+                Bekor qilish
+              </button>
+            </div>
           </div>
         </div>
       )}

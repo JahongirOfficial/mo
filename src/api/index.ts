@@ -70,7 +70,7 @@ export const sectionsAPI = {
   },
   create: (data: { name: string; icon?: string; color?: string }) => { clearCache('sections'); return api.post('/sections', data); },
   update: (id: string, data: { name: string; icon?: string; color?: string }) => { clearCache('section'); return api.put(`/sections/${id}`, data); },
-  delete: (id: string) => { clearCache('section'); return api.delete(`/sections/${id}`); },
+  delete: (id: string, keepCategories?: boolean) => { clearCache('section'); return api.delete(`/sections/${id}`, { params: { keepCategories } }); },
 };
 
 // Categories - cached

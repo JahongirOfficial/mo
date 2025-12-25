@@ -72,12 +72,12 @@ export function BolimTanlash() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         {/* Welcome Section */}
-        <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-12 mb-8 sm:mb-12 text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-40 sm:w-64 h-40 sm:h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-          <div className="absolute bottom-0 left-0 w-32 sm:w-48 h-32 sm:h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+        <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 lg:p-12 mb-6 sm:mb-8 lg:mb-12 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 sm:w-40 md:w-52 lg:w-64 h-32 sm:h-40 md:h-52 lg:h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="absolute bottom-0 left-0 w-24 sm:w-32 md:w-40 lg:w-48 h-24 sm:h-32 md:h-40 lg:h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
           <div className="relative z-10">
-            <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3">Xush kelibsiz, {user?.fullName?.split(' ')[0]}! 👋</h1>
-            <p className="text-emerald-100 text-sm sm:text-lg max-w-2xl">Farzandlaringizni dunyo darajasiga olib chiqamiz</p>
+            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-4xl font-bold mb-1 sm:mb-2 lg:mb-3">Xush kelibsiz, {user?.fullName?.split(' ')[0]}! 👋</h1>
+            <p className="text-emerald-100 text-xs sm:text-sm md:text-base lg:text-lg max-w-2xl">Farzandlaringizni dunyo darajasiga olib chiqamiz</p>
           </div>
         </div>
 

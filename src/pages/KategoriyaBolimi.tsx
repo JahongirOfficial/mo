@@ -287,8 +287,8 @@ export function KategoriyaBolimi() {
                             const isLessonCompleted = completedLessons.includes(lesson.id);
                             
                             return (
-                              <Link key={lesson.id} to={`/dars/${lesson.id}`} className="group flex items-center gap-3 p-3 bg-white rounded-xl hover:shadow-md transition-all">
-                                <div className={`w-8 h-8 rounded-lg ${isLessonCompleted ? 'bg-emerald-500' : `bg-gradient-to-br ${catColors.gradient}`} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
+                              <Link key={lesson.id} to={`/dars/${lesson.id}`} className="group flex items-start gap-3 p-3 bg-white rounded-xl hover:shadow-md transition-all">
+                                <div className={`w-8 h-8 rounded-lg ${isLessonCompleted ? 'bg-emerald-500' : `bg-gradient-to-br ${catColors.gradient}`} flex items-center justify-center text-white font-bold text-sm shrink-0 mt-0.5`}>
                                   {isLessonCompleted ? (
                                     <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
                                   ) : (
@@ -296,15 +296,15 @@ export function KategoriyaBolimi() {
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-sm text-slate-900 group-hover:text-emerald-600 truncate">{lesson.title}</p>
-                                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                                  <p className="font-medium text-sm text-slate-900 group-hover:text-emerald-600">{lesson.title}</p>
+                                  <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
                                     <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded ${type.color}`}>
                                       <span className="material-symbols-outlined text-xs">{type.icon}</span>
                                     </span>
                                     <span>{lesson.duration}</span>
                                   </div>
                                 </div>
-                                <span className="material-symbols-outlined text-slate-400 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all">arrow_forward</span>
+                                <span className="material-symbols-outlined text-slate-400 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all shrink-0 mt-0.5">arrow_forward</span>
                               </Link>
                             );
                           })}

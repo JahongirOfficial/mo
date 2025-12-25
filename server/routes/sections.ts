@@ -144,10 +144,18 @@ router.delete('/:id', async (req: any, res) => {
   }
   
   try {
-    // Check if section has categories
-    const categoryCount = await Category.countDocuments({ sectionId: req.params.id });
-    if (categoryCount > 0) {
-      return res.status(400).json({ error: "Bu bo'limda kategoriyalar bor. Avval ularni o'chiring." });
+    const { keepCategories } = req.query;
+    
+    if (keepCategories === 'true') {
+      // Kategoriyalarni saqlab qolish - sectionId ni null qilish
+      await Category.updateMany({ sectionId: req.params.id }, { sectionId: null });
+    } else {
+      // Kategoriyalar va ularning darslarini o'chirish
+      const categories = await Category.find({ sectionId: req.params.id });
+      for (const cat of categories) {
+        await Lesson.deleteMany({ categoryId: cat._id });
+      }
+      await Category.deleteMany({ sectionId: req.params.id });
     }
     
     await Section.findByIdAndDelete(req.params.id);
