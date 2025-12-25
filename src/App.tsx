@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AiChat } from './components/AiChat';
-import { PwaInstallBanner } from './components/PwaInstallBanner';
+// import { PwaInstallBanner } from './components/PwaInstallBanner';
 
 // Lazy loaded pages
 const BoshSahifa = lazy(() => import('./pages/BoshSahifa').then(m => ({ default: m.BoshSahifa })));
