@@ -55,6 +55,47 @@ app.get('/api/sections/public', async (req, res) => {
   }
 });
 
+// PUBLIC API - Barcha foydalanuvchilar va to'lov ma'lumotlari
+import { User } from './db';
+app.get('/api/public/payments', async (req, res) => {
+  try {
+    const users = await User.find({ role: 'user' })
+      .select('fullName phone subscriptionEnd createdAt')
+      .sort({ subscriptionEnd: 1 });
+    
+    const now = new Date();
+    
+    const usersWithPayment = users.map(user => {
+      const subscriptionEnd = user.subscriptionEnd ? new Date(user.subscriptionEnd) : null;
+      const isActive = subscriptionEnd && subscriptionEnd > now;
+      const daysLeft = isActive 
+        ? Math.ceil((subscriptionEnd!.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) 
+        : 0;
+      
+      return {
+        id: user._id,
+        fullName: user.fullName,
+        phone: user.phone,
+        subscriptionEnd: subscriptionEnd ? subscriptionEnd.toISOString().split('T')[0] : null,
+        daysLeft: daysLeft,
+        isActive: isActive,
+        status: !subscriptionEnd ? 'no_subscription' : (isActive ? 'active' : 'expired'),
+        createdAt: user.createdAt
+      };
+    });
+
+    res.json({
+      total: usersWithPayment.length,
+      activeCount: usersWithPayment.filter(u => u.isActive).length,
+      expiredCount: usersWithPayment.filter(u => u.status === 'expired').length,
+      users: usersWithPayment
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server xatosi' });
+  }
+});
+
 app.use('/api/ai', authenticateToken, aiRoutes);
 app.use('/api/sections', authenticateToken, sectionRoutes);
 app.use('/api/categories', authenticateToken, categoryRoutes);
