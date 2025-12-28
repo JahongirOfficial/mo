@@ -141,6 +141,8 @@ export const uploadAPI = {
 // AI Chat
 export const aiAPI = {
   chat: (message: string) => api.post('/ai/chat', { message }),
+  getHistory: () => api.get('/ai/history'),
+  clearHistory: () => api.delete('/ai/history'),
 };
 
 export default api;

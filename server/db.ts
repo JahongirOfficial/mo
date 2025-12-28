@@ -62,10 +62,22 @@ const lessonSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// ChatHistory Schema - AI suhbat tarixi
+const chatHistorySchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+  messages: [{
+    role: { type: String, enum: ['user', 'assistant'], required: true },
+    content: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
+  }],
+  updatedAt: { type: Date, default: Date.now }
+});
+
 export const User = mongoose.model('User', userSchema);
 export const Section = mongoose.model('Section', sectionSchema);
 export const Category = mongoose.model('Category', categorySchema);
 export const Lesson = mongoose.model('Lesson', lessonSchema);
+export const ChatHistory = mongoose.model('ChatHistory', chatHistorySchema);
 
 // Seed initial data
 async function seedData() {

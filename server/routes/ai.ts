@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { ChatHistory } from '../db';
 
 const router = Router();
 
@@ -38,9 +39,31 @@ JAVOB BERISH QOIDALARI:
 - Raqamli ro'yxatlardan foydalanishing mumkin
 - Hayotiy misollar va allomalar fikrlarini keltir`;
 
+// GET /api/ai/history - Tarixni yuklash (oxirgi 20 ta)
+router.get('/history', async (req, res) => {
+  try {
+    const userId = (req as any).user.id;
+    
+    const history = await ChatHistory.findOne({ userId });
+    
+    if (!history || history.messages.length === 0) {
+      return res.json({ messages: [] });
+    }
+    
+    // Oxirgi 20 ta xabarni qaytarish
+    const messages = history.messages.slice(-20);
+    res.json({ messages });
+  } catch (error) {
+    console.error('Tarix yuklash xatosi:', error);
+    res.status(500).json({ error: 'Server xatosi' });
+  }
+});
+
+// POST /api/ai/chat - Xabar yuborish va saqlash
 router.post('/chat', async (req, res) => {
   try {
     const { message } = req.body;
+    const userId = (req as any).user.id;
 
     if (!message) {
       return res.status(400).json({ error: 'Xabar kiritilmagan' });
@@ -49,6 +72,22 @@ router.post('/chat', async (req, res) => {
     if (!GROQ_API_KEY) {
       return res.status(500).json({ error: 'AI sozlanmagan' });
     }
+
+    // Tarixni olish yoki yaratish
+    let history = await ChatHistory.findOne({ userId });
+    if (!history) {
+      history = new ChatHistory({ userId, messages: [] });
+    }
+
+    // User xabarini saqlash
+    history.messages.push({ role: 'user', content: message });
+    history.updatedAt = new Date();
+
+    // Kontekst uchun oxirgi 10 ta xabarni olish
+    const contextMessages = history.messages.slice(-10).map(m => ({
+      role: m.role,
+      content: m.content
+    }));
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -60,7 +99,7 @@ router.post('/chat', async (req, res) => {
         model: 'meta-llama/llama-4-scout-17b-16e-instruct',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: message }
+          ...contextMessages
         ],
         max_tokens: 1024,
         temperature: 0.7,
@@ -70,15 +109,34 @@ router.post('/chat', async (req, res) => {
     if (!response.ok) {
       const error = await response.text();
       console.error('Groq API xatosi:', error);
+      await history.save(); // User xabarini saqlab qo'yamiz
       return res.status(500).json({ error: 'AI javob bera olmadi' });
     }
 
     const data = await response.json();
     const aiMessage = data.choices?.[0]?.message?.content || 'Javob topilmadi';
 
+    // AI javobini saqlash
+    history.messages.push({ role: 'assistant', content: aiMessage });
+    await history.save();
+
     res.json({ message: aiMessage });
   } catch (error) {
     console.error('AI xatosi:', error);
+    res.status(500).json({ error: 'Server xatosi' });
+  }
+});
+
+// DELETE /api/ai/history - Tarixni tozalash
+router.delete('/history', async (req, res) => {
+  try {
+    const userId = (req as any).user.id;
+    
+    await ChatHistory.deleteOne({ userId });
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Tarix tozalash xatosi:', error);
     res.status(500).json({ error: 'Server xatosi' });
   }
 });

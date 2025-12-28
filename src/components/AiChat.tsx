@@ -18,18 +18,56 @@ function renderText(text: string) {
   });
 }
 
+const DEFAULT_MESSAGE: Message = {
+  id: 0,
+  text: "Salom! Men Mukammal Ota Ona AI yordamchisiman. Farzand tarbiyasi bo'yicha savollaringizga javob beraman. 😊",
+  isUser: false
+};
+
 export function AiChat() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { id: 0, text: "Salom! Men Mukammal Ota Ona AI yordamchisiman. Farzand tarbiyasi bo'yicha savollaringizga javob beraman. 😊", isUser: false }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([DEFAULT_MESSAGE]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Tarixni yuklash
+  useEffect(() => {
+    if (isOpen && !historyLoaded) {
+      loadHistory();
+    }
+  }, [isOpen, historyLoaded]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const loadHistory = async () => {
+    try {
+      const res = await aiAPI.getHistory();
+      if (res.data.messages && res.data.messages.length > 0) {
+        const loadedMessages: Message[] = res.data.messages.map((m: any, i: number) => ({
+          id: i,
+          text: m.content,
+          isUser: m.role === 'user'
+        }));
+        setMessages(loadedMessages);
+      }
+      setHistoryLoaded(true);
+    } catch {
+      setHistoryLoaded(true);
+    }
+  };
+
+  const clearHistory = async () => {
+    try {
+      await aiAPI.clearHistory();
+      setMessages([DEFAULT_MESSAGE]);
+    } catch {
+      console.error('Tarixni tozalashda xatolik');
+    }
+  };
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
@@ -94,6 +132,14 @@ export function AiChat() {
               <h3 className="font-bold text-white text-sm">AI Yordamchi</h3>
               <p className="text-emerald-100 text-xs">Farzand tarbiyasi bo'yicha</p>
             </div>
+            {/* Clear button */}
+            <button
+              onClick={clearHistory}
+              className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+              title="Tarixni tozalash"
+            >
+              <span className="material-symbols-outlined text-xl">delete_sweep</span>
+            </button>
           </div>
 
           {/* Messages */}
