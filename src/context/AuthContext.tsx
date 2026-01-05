@@ -43,6 +43,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Har 5 soniyada subscription statusni serverdan yangilash (realtime sync)
+  useEffect(() => {
+    if (!user || user.role === 'admin') return;
+    
+    const interval = setInterval(() => {
+      refreshSubscription();
+    }, 5000); // 5 soniya
+    
+    return () => clearInterval(interval);
+  }, [user]);
+
   const loadUser = async () => {
     try {
       const res = await authAPI.getMe();

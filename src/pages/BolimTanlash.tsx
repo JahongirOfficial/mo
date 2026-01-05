@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { sectionsAPI } from '../api';
@@ -13,8 +13,33 @@ interface Section {
   categoryCount: number;
 }
 
+// Realtime countdown hook
+function useSubscriptionCountdown(endDate: string | null | undefined) {
+  const [now, setNow] = useState(Date.now());
+  
+  useEffect(() => {
+    if (!endDate) return;
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, [endDate]);
+  
+  return useMemo(() => {
+    if (!endDate) return null;
+    const end = new Date(endDate).getTime();
+    const diff = end - now;
+    if (diff <= 0) return { days: 0, hours: 0, minutes: 0, expired: true };
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return { days, hours, minutes, expired: false };
+  }, [endDate, now]);
+}
+
 export function BolimTanlash() {
   const { user, isAdmin, isSubscribed, subscription } = useAuth();
+  const countdown = useSubscriptionCountdown(subscription?.subscriptionEndDate);
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [showPauseModal, setShowPauseModal] = useState(false);
@@ -57,13 +82,25 @@ export function BolimTanlash() {
                   <span className="hidden sm:inline">Admin</span>
                 </Link>
               )}
-              {!isAdmin && subscription && (
-                <div className={`flex items-center gap-2 px-3 py-2 rounded-xl font-semibold text-sm ${
-                  subscription.daysLeft <= 3 ? 'bg-red-100 text-red-700' :
-                  subscription.daysLeft <= 5 ? 'bg-amber-100 text-amber-700' :
+              {!isAdmin && (countdown || subscription) && (
+                <div className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-semibold text-xs sm:text-sm ${
+                  countdown?.expired || (subscription?.daysLeft ?? 0) <= 0 ? 'bg-red-100 text-red-700' :
+                  (countdown?.days ?? subscription?.daysLeft ?? 0) <= 3 ? 'bg-red-100 text-red-700' :
+                  (countdown?.days ?? subscription?.daysLeft ?? 0) <= 5 ? 'bg-amber-100 text-amber-700' :
                   'bg-emerald-100 text-emerald-700'
                 }`}>
-                  <span>{subscription.daysLeft} kun qoldi</span>
+                  <span className="material-symbols-outlined text-base">schedule</span>
+                  {countdown ? (
+                    countdown.expired ? (
+                      <span>Muddat tugadi</span>
+                    ) : countdown.days > 0 ? (
+                      <span>{countdown.days}k {countdown.hours}s {countdown.minutes}d</span>
+                    ) : (
+                      <span>{countdown.hours}s {countdown.minutes}d</span>
+                    )
+                  ) : (
+                    <span>{subscription?.daysLeft} kun qoldi</span>
+                  )}
                 </div>
               )}
             </div>
