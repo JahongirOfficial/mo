@@ -62,8 +62,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (res.data.role !== 'admin') {
         await refreshSubscription();
       }
-    } catch {
-      localStorage.removeItem('token');
+    } catch (err: any) {
+      // Faqat 401 (unauthorized) da logout, boshqa xatoliklarda emas
+      if (err?.response?.status === 401) {
+        localStorage.removeItem('token');
+      }
+      // 403, 500 va boshqa xatoliklarda token saqlanadi
     } finally {
       setLoading(false);
     }

@@ -72,8 +72,8 @@ router.post('/register', async (req, res) => {
 
     const token = jwt.sign(
       { id: user._id, phone, role: 'user' },
-      JWT_SECRET,
-      { expiresIn: '7d' }
+      JWT_SECRET
+      // muddatsiz token - chiqib ketmaydi
     );
 
     res.json({
@@ -109,8 +109,8 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign(
       { id: user._id, phone: user.phone, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '7d' }
+      JWT_SECRET
+      // muddatsiz token - chiqib ketmaydi
     );
 
     res.json({
