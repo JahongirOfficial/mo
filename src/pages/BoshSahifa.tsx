@@ -6,26 +6,11 @@ const API_URL = window.location.hostname === 'localhost' || window.location.host
   : `https://${window.location.hostname}/api`;
 
 export function BoshSahifa() {
-  const [showLeadModal, setShowLeadModal] = useState(false);
-  const [leadForm, setLeadForm] = useState({ fullName: '', phone: '+998 ' });
-  const [leadSending, setLeadSending] = useState(false);
-  const [leadSent, setLeadSent] = useState(false);
   const [sections, setSections] = useState<any[]>([]);
 
   useEffect(() => {
     // Bo'limlarni yuklash
     loadSections();
-    
-    // Token bo'lmasa 1 soniyadan keyin modal ochilsin
-    const token = localStorage.getItem('token');
-    const leadSubmitted = localStorage.getItem('leadSubmitted');
-    
-    if (!token && !leadSubmitted) {
-      const timer = setTimeout(() => {
-        setShowLeadModal(true);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
   }, []);
 
   const loadSections = async () => {
@@ -40,49 +25,6 @@ export function BoshSahifa() {
     }
   };
 
-  const handleLeadSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (leadForm.fullName.trim().length < 3 || leadForm.phone.length < 13) return;
-    
-    setLeadSending(true);
-    try {
-      const res = await fetch(`${API_URL}/leads`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(leadForm)
-      });
-      
-      if (res.ok) {
-        setLeadSent(true);
-        localStorage.setItem('leadSubmitted', 'true');
-        setTimeout(() => {
-          setShowLeadModal(false);
-        }, 2000);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLeadSending(false);
-    }
-  };
-
-  const formatPhone = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    let formatted = '+998 ';
-    if (numbers.length > 3) {
-      const rest = numbers.slice(3, 12);
-      if (rest.length > 0) formatted += rest.slice(0, 2);
-      if (rest.length > 2) formatted += ' ' + rest.slice(2, 5);
-      if (rest.length > 5) formatted += ' ' + rest.slice(5, 7);
-      if (rest.length > 7) formatted += ' ' + rest.slice(7, 9);
-    }
-    return formatted;
-  };
-
-  const handlePhoneChange = (value: string) => {
-    const formatted = formatPhone(value);
-    setLeadForm({ ...leadForm, phone: formatted });
-  };
   const features = [
     { icon: 'psychology', title: 'Ishlaydigan metodlar', desc: 'Doim tajribada o\'xshagan metodlarni beramiz', color: 'from-emerald-500 to-emerald-600' },
     { icon: 'play_circle', title: 'Video darslar', desc: 'Interaktiv video kurslar', color: 'from-emerald-500 to-emerald-600' },
@@ -290,84 +232,6 @@ export function BoshSahifa() {
           </Link>
         </div>
       </section>
-
-      {/* Lead Capture Modal */}
-      {showLeadModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowLeadModal(false)} />
-          <div className="relative bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
-            <button 
-              onClick={() => setShowLeadModal(false)} 
-              className="absolute top-3 right-3 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg"
-            >
-              <span className="material-symbols-outlined text-xl">close</span>
-            </button>
-            
-            {leadSent ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-                  <span className="material-symbols-outlined text-3xl text-emerald-600">check_circle</span>
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">Rahmat!</h3>
-                <p className="text-slate-600">Tez orada siz bilan bog'lanamiz</p>
-              </div>
-            ) : (
-              <>
-                <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Bepul maslahat oling!</h3>
-                  <p className="text-slate-600 text-sm">Ma'lumotlaringizni qoldiring, mutaxassislarimiz siz bilan bog'lanadi</p>
-                </div>
-                
-                <form onSubmit={handleLeadSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Ism Familiya</label>
-                    <input
-                      type="text"
-                      value={leadForm.fullName}
-                      onChange={(e) => setLeadForm({ ...leadForm, fullName: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:bg-white focus:border-emerald-500 outline-none transition-all"
-                      placeholder="Ismingizni kiriting"
-                      required
-                      minLength={3}
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Telefon raqam</label>
-                    <input
-                      type="tel"
-                      value={leadForm.phone}
-                      onChange={(e) => handlePhoneChange(e.target.value)}
-                      className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:bg-white focus:border-emerald-500 outline-none transition-all"
-                      placeholder="+998 90 123 45 67"
-                      required
-                    />
-                  </div>
-                  
-                  <button
-                    type="submit"
-                    disabled={leadSending || leadForm.fullName.length < 3 || leadForm.phone.length < 13}
-                    className="w-full py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {leadSending ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                        Yuborilmoqda...
-                      </span>
-                    ) : (
-                      'Yuborish'
-                    )}
-                  </button>
-                </form>
-                
-                <p className="text-xs text-slate-500 text-center mt-4">
-                  Yuborish tugmasini bosish orqali siz shaxsiy ma'lumotlaringizni qayta ishlashga rozilik bildirasiz
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Footer */}
       <footer className="bg-slate-900 text-white py-10 sm:py-16">
