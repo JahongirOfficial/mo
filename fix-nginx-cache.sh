@@ -1,11 +1,11 @@
 #!/bin/bash
 
-echo "🔧 Fixing Nginx configuration for Vite SPA..."
+echo "🔧 Fixing Nginx configuration for Vite SPA on 164.68.109.208..."
 
 # 1. Copy new nginx config
 echo "📋 Copying nginx configuration..."
-sudo cp nginx-fix.conf /etc/nginx/sites-available/moo
-sudo ln -sf /etc/nginx/sites-available/moo /etc/nginx/sites-enabled/moo
+sudo cp nginx-fix.conf /etc/nginx/sites-available/mo
+sudo ln -sf /etc/nginx/sites-available/mo /etc/nginx/sites-enabled/mo
 
 # 2. Test nginx config
 echo "✅ Testing nginx configuration..."
@@ -36,4 +36,6 @@ echo "📝 What was fixed:"
 echo "   ✓ index.html is now never cached"
 echo "   ✓ /assets/* returns 404 (not index.html) for missing files"
 echo "   ✓ /assets/* cached for 1 year (immutable)"
+echo ""
+echo "🌐 Test your site: http://164.68.109.208"
 echo ""

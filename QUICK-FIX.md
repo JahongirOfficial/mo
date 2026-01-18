@@ -6,30 +6,37 @@ Failed to load module script: Expected a JavaScript module script
 but the server responded with a MIME type of "text/html"
 ```
 
-## ⚡ Быстрое решение (на сервере)
+## ⚡ Быстрое решение (на сервере 164.68.109.208)
 
 ### Вариант 1: Автоматическое исправление
 
 ```bash
-# На сервере (45.92.173.33)
-cd /var/www/moo
+# На сервере (164.68.109.208)
+ssh root@164.68.109.208
+cd /var/www/mo
 bash fix-nginx-cache.sh
 ```
 
 ### Вариант 2: Ручное исправление
 
 ```bash
-# 1. Скопировать новую конфигурацию
-sudo cp nginx-fix.conf /etc/nginx/sites-available/moo
-sudo ln -sf /etc/nginx/sites-available/moo /etc/nginx/sites-enabled/moo
+# 1. Подключиться к серверу
+ssh root@164.68.109.208
 
-# 2. Проверить конфигурацию
+# 2. Перейти в папку проекта
+cd /var/www/mo
+
+# 3. Скопировать новую конфигурацию
+sudo cp nginx-fix.conf /etc/nginx/sites-available/mo
+sudo ln -sf /etc/nginx/sites-available/mo /etc/nginx/sites-enabled/mo
+
+# 4. Проверить конфигурацию
 sudo nginx -t
 
-# 3. Перезагрузить nginx
+# 5. Перезагрузить nginx
 sudo systemctl reload nginx
 
-# 4. Очистить кеш nginx (если есть)
+# 6. Очистить кеш nginx (если есть)
 sudo rm -rf /var/cache/nginx/*
 ```
 
@@ -45,12 +52,15 @@ sudo rm -rf /var/cache/nginx/*
 
 ```bash
 # Проверить, что index.html не кешируется
-curl -I http://45.92.173.33/index.html | grep Cache-Control
+curl -I http://164.68.109.208/index.html | grep Cache-Control
 # Должно быть: Cache-Control: no-store, no-cache
 
 # Проверить, что несуществующий asset возвращает 404
-curl -I http://45.92.173.33/assets/fake-file.js
+curl -I http://164.68.109.208/assets/fake-file.js
 # Должно быть: HTTP/1.1 404 Not Found
+
+# Проверить текущую конфигурацию nginx
+cat /etc/nginx/sites-available/mo
 ```
 
 ## 📋 Что было исправлено
