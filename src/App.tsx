@@ -1,7 +1,20 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useState, createContext, useContext } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AiChat } from './components/AiChat';
+
+// AI Chat Context
+interface AiChatContextType {
+  openChatWithMessage: (message: string) => void;
+}
+
+const AiChatContext = createContext<AiChatContextType | null>(null);
+
+export const useAiChat = () => {
+  const context = useContext(AiChatContext);
+  if (!context) throw new Error('useAiChat must be used within AiChatProvider');
+  return context;
+};
 // import { PwaInstallBanner } from './components/PwaInstallBanner';
 
 // Lazy loaded pages
@@ -10,6 +23,7 @@ const KirishSahifasi = lazy(() => import('./pages/KirishSahifasi').then(m => ({ 
 const BolimTanlash = lazy(() => import('./pages/BolimTanlash').then(m => ({ default: m.BolimTanlash })));
 const KategoriyaBolimi = lazy(() => import('./pages/KategoriyaBolimi').then(m => ({ default: m.KategoriyaBolimi })));
 const DarsSahifasi = lazy(() => import('./pages/DarsSahifasi').then(m => ({ default: m.DarsSahifasi })));
+const MuammolarVaYechimlar = lazy(() => import('./pages/MuammolarVaYechimlar').then(m => ({ default: m.MuammolarVaYechimlar })));
 const AdminPanel = lazy(() => import('./pages/admin/AdminPanel').then(m => ({ default: m.AdminPanel })));
 const AdminKategoriyalar = lazy(() => import('./pages/admin/AdminKategoriyalar').then(m => ({ default: m.AdminKategoriyalar })));
 const AdminDarslar = lazy(() => import('./pages/admin/AdminDarslar').then(m => ({ default: m.AdminDarslar })));
@@ -56,6 +70,7 @@ function AppRoutes() {
         
         {/* Protected */}
         <Route path="/bolim" element={<ProtectedRoute><BolimTanlash /></ProtectedRoute>} />
+        <Route path="/muammolar" element={<ProtectedRoute><MuammolarVaYechimlar /></ProtectedRoute>} />
         <Route path="/kategoriya/:id" element={<ProtectedRoute><KategoriyaBolimi /></ProtectedRoute>} />
         <Route path="/dars/:id" element={<ProtectedRoute><DarsSahifasi /></ProtectedRoute>} />
         
@@ -72,10 +87,22 @@ function AppRoutes() {
   );
 }
 
-function AiChatWrapper() {
+interface AiChatWrapperProps {
+  initialMessage?: string;
+  chatKey: number;
+}
+
+function AiChatWrapper({ initialMessage, chatKey }: AiChatWrapperProps) {
   const { user } = useAuth();
+
   if (!user) return null;
-  return <AiChat />;
+
+  return (
+    <AiChat 
+      key={chatKey} 
+      initialMessage={initialMessage}
+    />
+  );
 }
 
 function PwaBannerWrapper() {
@@ -86,12 +113,25 @@ function PwaBannerWrapper() {
 }
 
 function App() {
+  const [initialMessage, setInitialMessage] = useState<string | undefined>();
+  const [chatKey, setChatKey] = useState(0);
+
+  const openChatWithMessage = (message: string) => {
+    setInitialMessage(message);
+    setChatKey(prev => prev + 1);
+  };
+
   return (
     <AuthProvider>
       <BrowserRouter>
-        <PwaBannerWrapper />
-        <AppRoutes />
-        <AiChatWrapper />
+        <AiChatContext.Provider value={{ openChatWithMessage }}>
+          <PwaBannerWrapper />
+          <AppRoutes />
+          <AiChatWrapper 
+            initialMessage={initialMessage}
+            chatKey={chatKey}
+          />
+        </AiChatContext.Provider>
       </BrowserRouter>
     </AuthProvider>
   );

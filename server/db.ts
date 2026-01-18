@@ -23,6 +23,15 @@ const userSchema = new mongoose.Schema({
   isSubscribed: { type: Boolean, default: false },
   subscriptionEnd: { type: Date, default: null },
   usedFreeTrial: { type: Boolean, default: false },
+  // AI Onboarding ma'lumotlari
+  aiOnboardingCompleted: { type: Boolean, default: false },
+  aiProfile: {
+    occupation: { type: String, default: '' },
+    interests: { type: String, default: '' },
+    childrenAges: { type: String, default: '' },
+    mainConcerns: { type: String, default: '' },
+    additionalInfo: { type: String, default: '' }
+  },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -70,7 +79,30 @@ const chatHistorySchema = new mongoose.Schema({
     content: { type: String, required: true },
     createdAt: { type: Date, default: Date.now }
   }],
+  onboardingStep: { type: Number, default: 0 }, // 0: boshlang'ich, 1-5: savollar, 6: tugallangan
   updatedAt: { type: Date, default: Date.now }
+});
+
+// FollowUp Schema - Kuzatuv tizimi
+const followUpSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  planTitle: { type: String, required: true }, // Reja nomi (masalan: "Telefon muammosi")
+  planContent: { type: String, required: true }, // To'liq reja matni
+  startDate: { type: Date, default: Date.now },
+  followUpDate: { type: Date, required: true }, // 3 kundan keyin
+  status: { 
+    type: String, 
+    enum: ['pending', 'reminded', 'completed', 'cancelled'], 
+    default: 'pending' 
+  },
+  progress: [{
+    day: { type: Number, required: true }, // 1-7
+    completed: { type: Boolean, default: false },
+    note: { type: String, default: '' },
+    completedAt: { type: Date }
+  }],
+  finalFeedback: { type: String, default: '' }, // Oxirgi natija
+  createdAt: { type: Date, default: Date.now }
 });
 
 export const User = mongoose.model('User', userSchema);
@@ -78,6 +110,7 @@ export const Section = mongoose.model('Section', sectionSchema);
 export const Category = mongoose.model('Category', categorySchema);
 export const Lesson = mongoose.model('Lesson', lessonSchema);
 export const ChatHistory = mongoose.model('ChatHistory', chatHistorySchema);
+export const FollowUp = mongoose.model('FollowUp', followUpSchema);
 
 // Seed initial data
 async function seedData() {

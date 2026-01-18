@@ -7,30 +7,56 @@ interface Message {
   isUser: boolean;
 }
 
-// **bold** textni render qilish
+interface AiChatProps {
+  initialMessage?: string;
+  onOpen?: () => void;
+}
+
+// **bold** textni va yangi qatorlarni render qilish
 function renderText(text: string) {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>;
-    }
-    return <span key={i}>{part}</span>;
+  // Yangi qatorlarni <br> ga aylantirish
+  const lines = text.split('\n');
+  
+  return lines.map((line, lineIndex) => {
+    const parts = line.split(/(\*\*[^*]+\*\*)/g);
+    const renderedLine = parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>;
+      }
+      return <span key={i}>{part}</span>;
+    });
+    
+    return (
+      <span key={lineIndex}>
+        {renderedLine}
+        {lineIndex < lines.length - 1 && <br />}
+      </span>
+    );
   });
 }
 
 const DEFAULT_MESSAGE: Message = {
   id: 0,
-  text: "Salom! Men Mukammal Ota Ona AI yordamchisiman. Farzand tarbiyasi bo'yicha savollaringizga javob beraman. 😊",
+  text: "Assalomu alaykum!\n\nMen **Mukammal Ota Ona AI** yordamchisiman. Sizga farzand tarbiyasi, shaxsiy rivojlanish va fikrlash bo'yicha yordam beraman.\n\nQanday yordam bera olaman?",
   isUser: false
 };
 
-export function AiChat() {
+export function AiChat({ initialMessage, onOpen }: AiChatProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([DEFAULT_MESSAGE]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [initialMessageSent, setInitialMessageSent] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-open chat when initialMessage is provided
+  useEffect(() => {
+    if (initialMessage && !isOpen) {
+      setIsOpen(true);
+      setInitialMessageSent(false);
+    }
+  }, [initialMessage]);
 
   // Tarixni yuklash
   useEffect(() => {
@@ -38,6 +64,21 @@ export function AiChat() {
       loadHistory();
     }
   }, [isOpen, historyLoaded]);
+
+  // Initial message yuborish
+  useEffect(() => {
+    if (isOpen && initialMessage && !initialMessageSent && historyLoaded) {
+      setInitialMessageSent(true);
+      sendMessage(initialMessage);
+    }
+  }, [isOpen, initialMessage, initialMessageSent, historyLoaded]);
+
+  // Chat ochilganda callback
+  useEffect(() => {
+    if (isOpen && onOpen) {
+      onOpen();
+    }
+  }, [isOpen, onOpen]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -69,16 +110,17 @@ export function AiChat() {
     }
   };
 
-  const sendMessage = async () => {
-    if (!input.trim() || loading) return;
+  const sendMessage = async (messageText?: string) => {
+    const textToSend = messageText || input.trim();
+    if (!textToSend || loading) return;
 
-    const userMessage: Message = { id: Date.now(), text: input, isUser: true };
+    const userMessage: Message = { id: Date.now(), text: textToSend, isUser: true };
     setMessages(prev => [...prev, userMessage]);
-    setInput('');
+    if (!messageText) setInput('');
     setLoading(true);
 
     try {
-      const res = await aiAPI.chat(input);
+      const res = await aiAPI.chat(textToSend);
       const aiMessage: Message = { id: Date.now() + 1, text: res.data.message, isUser: false };
       setMessages(prev => [...prev, aiMessage]);
     } catch {
@@ -88,7 +130,11 @@ export function AiChat() {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleSendClick = () => {
+    sendMessage();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -176,13 +222,13 @@ export function AiChat() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyDown}
                 placeholder="Savolingizni yozing..."
                 className="flex-1 px-4 py-2.5 bg-slate-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500/50"
                 disabled={loading}
               />
               <button
-                onClick={sendMessage}
+                onClick={handleSendClick}
                 disabled={loading || !input.trim()}
                 className="w-10 h-10 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-300 rounded-xl flex items-center justify-center text-white transition-colors"
               >

@@ -19,8 +19,58 @@ interface Section {
   name: string;
 }
 
-const icons = ['psychology', 'school', 'favorite', 'forum', 'fact_check', 'fitness_center', 'family_restroom', 'child_care', 'emoji_emotions', 'health_and_safety'];
-const colors = ['green', 'teal', 'red', 'purple', 'orange', 'blue'];
+const icons = [
+  // Asosiy tarbiya
+  'psychology', 'school', 'favorite', 'forum', 'child_care', 'family_restroom',
+  
+  // Ta'lim va rivojlanish
+  'menu_book', 'auto_stories', 'library_books', 'history_edu', 'science', 'calculate',
+  
+  // Sport va salomatlik
+  'fitness_center', 'sports_soccer', 'sports_basketball', 'pool', 'directions_run', 'self_improvement',
+  
+  // Ovqatlanish va uyqu
+  'restaurant', 'lunch_dining', 'bedtime', 'hotel', 'local_cafe',
+  
+  // Gigiyena va parvarish
+  'clean_hands', 'health_and_safety', 'medical_services', 'healing', 'spa',
+  
+  // Ijtimoiy va emotsional
+  'groups', 'diversity_3', 'volunteer_activism', 'handshake', 'favorite_border',
+  
+  // Emotsiyalar
+  'sentiment_satisfied', 'mood', 'face', 'emoji_emotions', 'sentiment_very_satisfied',
+  
+  // O'yin va dam olish
+  'toys', 'sports_esports', 'park', 'nature_people', 'celebration',
+  
+  // Texnologiya va media
+  'devices', 'smartphone', 'tv', 'headphones', 'videocam',
+  
+  // San'at va ijodiylik
+  'palette', 'music_note', 'theater_comedy', 'draw', 'brush',
+  
+  // Dunyo va sayohat
+  'public', 'language', 'travel_explore', 'map', 'flight',
+  
+  // Vaqt va tartib
+  'schedule', 'alarm', 'timer', 'event', 'calendar_month',
+  
+  // Muloqot
+  'chat', 'forum', 'question_answer', 'record_voice_over', 'hearing',
+  
+  // Maqsad va yutuqlar
+  'emoji_events', 'workspace_premium', 'star', 'grade', 'military_tech',
+  
+  // Boshqalar
+  'lightbulb', 'psychology_alt', 'fact_check', 'checklist', 'task_alt'
+];
+
+const colors = [
+  'green', 'teal', 'red', 'purple', 'orange', 'blue',
+  'pink', 'indigo', 'cyan', 'amber', 'lime', 'emerald',
+  'sky', 'violet', 'fuchsia', 'rose'
+];
 
 export function AdminKategoriyalar() {
   const navigate = useNavigate();
@@ -91,12 +141,22 @@ export function AdminKategoriyalar() {
   };
 
   const colorClasses: Record<string, { bg: string; gradient: string }> = {
-    green: { bg: 'bg-emerald-500', gradient: 'from-emerald-500 to-emerald-600' },
-    blue: { bg: 'bg-emerald-500', gradient: 'from-emerald-500 to-emerald-600' },
-    red: { bg: 'bg-red-500', gradient: 'from-red-500 to-red-600' },
-    purple: { bg: 'bg-emerald-500', gradient: 'from-emerald-500 to-emerald-600' },
-    orange: { bg: 'bg-orange-500', gradient: 'from-orange-500 to-orange-600' },
+    green: { bg: 'bg-green-500', gradient: 'from-green-500 to-green-600' },
+    emerald: { bg: 'bg-emerald-500', gradient: 'from-emerald-500 to-emerald-600' },
     teal: { bg: 'bg-teal-500', gradient: 'from-teal-500 to-teal-600' },
+    cyan: { bg: 'bg-cyan-500', gradient: 'from-cyan-500 to-cyan-600' },
+    sky: { bg: 'bg-sky-500', gradient: 'from-sky-500 to-sky-600' },
+    blue: { bg: 'bg-blue-500', gradient: 'from-blue-500 to-blue-600' },
+    indigo: { bg: 'bg-indigo-500', gradient: 'from-indigo-500 to-indigo-600' },
+    violet: { bg: 'bg-violet-500', gradient: 'from-violet-500 to-violet-600' },
+    purple: { bg: 'bg-purple-500', gradient: 'from-purple-500 to-purple-600' },
+    fuchsia: { bg: 'bg-fuchsia-500', gradient: 'from-fuchsia-500 to-fuchsia-600' },
+    pink: { bg: 'bg-pink-500', gradient: 'from-pink-500 to-pink-600' },
+    rose: { bg: 'bg-rose-500', gradient: 'from-rose-500 to-rose-600' },
+    red: { bg: 'bg-red-500', gradient: 'from-red-500 to-red-600' },
+    orange: { bg: 'bg-orange-500', gradient: 'from-orange-500 to-orange-600' },
+    amber: { bg: 'bg-amber-500', gradient: 'from-amber-500 to-amber-600' },
+    lime: { bg: 'bg-lime-500', gradient: 'from-lime-500 to-lime-600' },
   };
 
   return (
@@ -250,115 +310,144 @@ export function AdminKategoriyalar() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setShowModal(false)} />
-          <div className="relative bg-white rounded-2xl w-full max-w-md p-5 sm:p-6 shadow-2xl">
-            <button onClick={() => setShowModal(false)} className="absolute top-3 right-3 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all">
-              <span className="material-symbols-outlined text-xl">close</span>
-            </button>
+          <div className="relative bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-white border-b border-slate-100 px-5 sm:px-6 py-4 flex items-center justify-between z-10">
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">{editingId ? 'Kategoriyani tahrirlash' : 'Yangi kategoriya'}</h2>
+              <button onClick={() => setShowModal(false)} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all">
+                <span className="material-symbols-outlined text-xl">close</span>
+              </button>
+            </div>
             
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-4">{editingId ? 'Kategoriyani tahrirlash' : 'Yangi kategoriya'}</h2>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Bo'lim</label>
-                <select
-                  value={form.sectionId}
-                  onChange={(e) => setForm({ ...form, sectionId: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-lg focus:bg-white focus:border-emerald-500 outline-none transition-all text-sm"
-                  required
-                >
-                  <option value="">Bo'lim tanlang</option>
-                  {sections.map((sec) => (
-                    <option key={sec.id} value={sec.id}>{sec.name}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Nomi</label>
-                <input
-                  type="text"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-lg focus:bg-white focus:border-primary outline-none transition-all text-sm"
-                  placeholder="Kategoriya nomi"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Tavsif</label>
-                <textarea
-                  value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  className="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-lg focus:bg-white focus:border-primary outline-none transition-all text-sm resize-none"
-                  placeholder="Qisqacha tavsif"
-                  rows={2}
-                />
-              </div>
-              
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-2">Ikonka</label>
-                <div className="flex flex-wrap gap-1.5">
-                  {icons.map((icon) => (
-                    <button
-                      key={icon}
-                      type="button"
-                      onClick={() => setForm({ ...form, icon })}
-                      className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
-                        form.icon === icon 
-                          ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg scale-110' 
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                      }`}
+            <form onSubmit={handleSubmit} className="p-5 sm:p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left Column - Basic Info */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Bo'lim</label>
+                    <select
+                      value={form.sectionId}
+                      onChange={(e) => setForm({ ...form, sectionId: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-lg focus:bg-white focus:border-emerald-500 outline-none transition-all text-sm"
+                      required
                     >
-                      <span className="material-symbols-outlined text-lg">{icon}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-2">Rang</label>
-                <div className="flex gap-2">
-                  {colors.map((color) => (
-                    <button
-                      key={color}
-                      type="button"
-                      onClick={() => setForm({ ...form, color })}
-                      className={`w-9 h-9 rounded-lg bg-gradient-to-br ${colorClasses[color]?.gradient} flex items-center justify-center text-white transition-all ${
-                        form.color === color ? 'ring-2 ring-offset-2 ring-primary scale-110' : ''
-                      }`}
-                    >
-                      {form.color === color && <span className="material-symbols-outlined text-sm">check</span>}
-                    </button>
-                  ))}
-                </div>
-              </div>
+                      <option value="">Bo'lim tanlang</option>
+                      {sections.map((sec) => (
+                        <option key={sec.id} value={sec.id}>{sec.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Nomi</label>
+                    <input
+                      type="text"
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-lg focus:bg-white focus:border-primary outline-none transition-all text-sm"
+                      placeholder="Kategoriya nomi"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Tavsif</label>
+                    <textarea
+                      value={form.description}
+                      onChange={(e) => setForm({ ...form, description: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-lg focus:bg-white focus:border-primary outline-none transition-all text-sm resize-none"
+                      placeholder="Qisqacha tavsif"
+                      rows={3}
+                    />
+                  </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Tartib raqami</label>
-                  <input
-                    type="number"
-                    value={form.orderIndex}
-                    onChange={(e) => setForm({ ...form, orderIndex: parseInt(e.target.value) || 0 })}
-                    className="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-lg focus:bg-white focus:border-primary outline-none transition-all text-sm"
-                    min="0"
-                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">Tartib raqami</label>
+                      <input
+                        type="number"
+                        value={form.orderIndex}
+                        onChange={(e) => setForm({ ...form, orderIndex: parseInt(e.target.value) || 0 })}
+                        className="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-lg focus:bg-white focus:border-primary outline-none transition-all text-sm"
+                        min="0"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">Holat</label>
+                      <select
+                        value={form.status}
+                        onChange={(e) => setForm({ ...form, status: e.target.value as 'active' | 'pause' })}
+                        className="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-lg focus:bg-white focus:border-emerald-500 outline-none transition-all text-sm"
+                      >
+                        <option value="active">Active</option>
+                        <option value="pause">Pause</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Holat</label>
-                  <select
-                    value={form.status}
-                    onChange={(e) => setForm({ ...form, status: e.target.value as 'active' | 'pause' })}
-                    className="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-100 rounded-lg focus:bg-white focus:border-emerald-500 outline-none transition-all text-sm"
-                  >
-                    <option value="active">Active</option>
-                    <option value="pause">Pause</option>
-                  </select>
+
+                {/* Right Column - Icons & Colors */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-2">Ikonka</label>
+                    <div className="h-48 overflow-y-auto border-2 border-slate-100 rounded-lg p-3 bg-slate-50">
+                      <div className="grid grid-cols-6 gap-2">
+                        {icons.map((icon) => (
+                          <button
+                            key={icon}
+                            type="button"
+                            onClick={() => setForm({ ...form, icon })}
+                            className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
+                              form.icon === icon 
+                                ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg scale-105' 
+                                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                            }`}
+                            title={icon}
+                          >
+                            <span className="material-symbols-outlined text-lg">{icon}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-2">Rang</label>
+                    <div className="border-2 border-slate-100 rounded-lg p-3 bg-slate-50">
+                      <div className="grid grid-cols-8 gap-2">
+                        {colors.map((color) => (
+                          <button
+                            key={color}
+                            type="button"
+                            onClick={() => setForm({ ...form, color })}
+                            className={`w-10 h-10 rounded-lg bg-gradient-to-br ${colorClasses[color]?.gradient} flex items-center justify-center text-white transition-all shadow-md hover:scale-105 ${
+                              form.color === color ? 'ring-2 ring-offset-2 ring-slate-400 scale-105' : ''
+                            }`}
+                            title={color}
+                          >
+                            {form.color === color && <span className="material-symbols-outlined text-base">check</span>}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Preview */}
+                  <div className="border-2 border-slate-100 rounded-lg p-4 bg-gradient-to-br from-slate-50 to-slate-100">
+                    <p className="text-xs font-semibold text-slate-700 mb-3">Ko'rinish:</p>
+                    <div className="flex items-center gap-3 bg-white rounded-xl p-3 shadow-sm">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colorClasses[form.color]?.gradient || 'from-emerald-500 to-emerald-600'} flex items-center justify-center text-white shadow-lg`}>
+                        <span className="material-symbols-outlined text-xl">{form.icon}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-slate-900 truncate">{form.name || 'Kategoriya nomi'}</p>
+                        <p className="text-xs text-slate-500 truncate">{form.description || 'Tavsif'}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               
-              <div className="flex gap-3 pt-3">
+              <div className="flex gap-3 pt-6 mt-6 border-t border-slate-100">
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-2.5 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition-colors text-sm">
                   Bekor qilish
                 </button>

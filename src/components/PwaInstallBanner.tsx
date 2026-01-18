@@ -54,7 +54,7 @@ export function PwaInstallBanner() {
       });
     } else if (isIOS) {
       // iOS uchun modal ko'rsatish
-      alert("📱 Ilovani o'rnatish:\n\n1. Pastdagi 'Ulashish' tugmasini bosing\n2. 'Bosh ekranga qo'shish' ni tanlang");
+      alert("Ilovani o'rnatish:\n\n1. Pastdagi 'Ulashish' tugmasini bosing\n2. 'Bosh ekranga qo'shish' ni tanlang");
     }
   };
 

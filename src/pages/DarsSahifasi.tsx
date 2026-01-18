@@ -14,7 +14,7 @@ interface Lesson {
 export function DarsSahifasi() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAdmin, subscription } = useAuth();
+  const { isAdmin, subscription, logout } = useAuth();
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [loading, setLoading] = useState(true);
   const [subscriptionError, setSubscriptionError] = useState(false);
@@ -23,6 +23,11 @@ export function DarsSahifasi() {
   const [openSection, setOpenSection] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [bufferStatus, setBufferStatus] = useState<string>('');
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   useEffect(() => { loadLesson(); window.scrollTo(0, 0); }, [id]);
 
@@ -213,6 +218,13 @@ export function DarsSahifasi() {
               title="Ulashish"
             >
               <span className="material-symbols-outlined">share</span>
+            </button>
+            <button 
+              onClick={handleLogout}
+              className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+              title="Chiqish"
+            >
+              <span className="material-symbols-outlined">logout</span>
             </button>
           </div>
         </div>
