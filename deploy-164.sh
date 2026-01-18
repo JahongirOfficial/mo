@@ -121,6 +121,35 @@ server {
     root /var/www/mo/dist;
     index index.html;
 
+    # CRITICAL: index.html must NEVER be cached
+    location = /index.html {
+        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
+        add_header Pragma "no-cache";
+        add_header Expires "0";
+        try_files $uri =404;
+    }
+
+    # Assets folder - serve directly, NEVER fallback to index.html
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # Static files (images, fonts, etc)
+    location ~* \.(png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|json|xml)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    # Service worker - no cache
+    location = /sw.js {
+        add_header Cache-Control "no-store, no-cache, must-revalidate";
+        add_header Pragma "no-cache";
+        try_files $uri =404;
+    }
+
     # Uploads
     location /uploads/ {
         alias /var/www/mo/uploads/;
@@ -149,13 +178,21 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
     }
 
-    # React Router SPA
+    # React Router SPA fallback - ONLY for HTML routes
     location / {
         try_files $uri $uri/ /index.html;
     }
 
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "no-referrer-when-downgrade" always;
+
+    # Gzip compression
     gzip on;
-    gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
 }
 EOF
 
