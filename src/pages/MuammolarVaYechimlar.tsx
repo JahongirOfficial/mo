@@ -199,7 +199,7 @@ export function MuammolarVaYechimlar() {
   return (
     <div className="min-h-screen bg-slate-50 font-display">
       {/* Header */}
-      <header className="bg-white border-b border-slate-100 sticky top-0 z-40">
+      <header className="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-md">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14 sm:h-16">
             <Link to="/bolim" className="flex items-center gap-2 sm:gap-3">
@@ -306,14 +306,16 @@ export function MuammolarVaYechimlar() {
                 <button
                   key={problem.id}
                   onClick={() => setSelectedProblem(problem)}
-                  className="group bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-lg hover:border-emerald-200 transition-all text-left"
+                  className="group bg-white rounded-2xl p-5 shadow-md border border-slate-100 hover:shadow-xl hover:border-emerald-200 transition-all text-left"
                 >
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors.bg} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform shadow-md`}>
-                    <span className="material-symbols-outlined text-2xl">{problem.icon}</span>
+                  <div className="flex items-center gap-4 mb-3">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colors.bg} flex items-center justify-center text-white group-hover:scale-110 transition-transform shadow-md shrink-0`}>
+                      <span className="material-symbols-outlined text-2xl">{problem.icon}</span>
+                    </div>
+                    <h3 className="font-bold text-slate-800 line-clamp-2 group-hover:text-emerald-600 transition-colors flex-1">
+                      {problem.title}
+                    </h3>
                   </div>
-                  <h3 className="font-bold text-slate-800 mb-2 line-clamp-2 group-hover:text-emerald-600 transition-colors">
-                    {problem.title}
-                  </h3>
                   <div className="flex items-center justify-between">
                     <span className={`text-xs px-2 py-1 rounded-lg ${colors.light} ${colors.text} font-medium`}>
                       {categoryNames[problem.category]}

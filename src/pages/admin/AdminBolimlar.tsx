@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { sectionsAPI } from '../../api';
 
 interface Section {
@@ -22,7 +22,6 @@ const colors = [
 ];
 
 export function AdminBolimlar() {
-  const navigate = useNavigate();
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -31,6 +30,7 @@ export function AdminBolimlar() {
   const [saving, setSaving] = useState(false);
   const [deleteModal, setDeleteModal] = useState<{ show: boolean; section: Section | null }>({ show: false, section: null });
   const [deleting, setDeleting] = useState(false);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
   useEffect(() => {
     loadSections();
@@ -76,6 +76,8 @@ export function AdminBolimlar() {
     }
   };
 
+  const [errorModal, setErrorModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
+
   const handleDelete = async (id: string, keepCategories: boolean) => {
     setDeleting(true);
     try {
@@ -83,7 +85,7 @@ export function AdminBolimlar() {
       setDeleteModal({ show: false, section: null });
       loadSections();
     } catch (err: any) {
-      alert(err.response?.data?.error || "Xatolik yuz berdi");
+      setErrorModal({ show: true, message: err.response?.data?.error || "Xatolik yuz berdi" });
     } finally {
       setDeleting(false);
     }
@@ -95,8 +97,16 @@ export function AdminBolimlar() {
 
   return (
     <div className="min-h-screen bg-slate-100 font-display">
+      {/* Mobile Sidebar Overlay */}
+      {showMobileSidebar && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setShowMobileSidebar(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-slate-900 text-white hidden lg:flex flex-col">
+      <aside className={`fixed left-0 top-0 bottom-0 w-64 bg-slate-900 text-white z-50 transition-transform duration-300 ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 flex flex-col`}>
         <div className="p-6 border-b border-slate-800">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
@@ -111,34 +121,34 @@ export function AdminBolimlar() {
         
         <nav className="flex-1 p-4">
           <p className="text-xs text-slate-500 uppercase tracking-wider mb-3 px-3">Boshqaruv</p>
-          <Link to="/admin" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2">
+          <Link to="/admin" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2" onClick={() => setShowMobileSidebar(false)}>
             <span className="material-symbols-outlined">dashboard</span>
             Dashboard
           </Link>
-          <Link to="/admin/bolimlar" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800 text-white mb-2">
+          <Link to="/admin/bolimlar" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800 text-white mb-2" onClick={() => setShowMobileSidebar(false)}>
             <span className="material-symbols-outlined">folder</span>
             Bo'limlar
           </Link>
-          <Link to="/admin/kategoriyalar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2">
+          <Link to="/admin/kategoriyalar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2" onClick={() => setShowMobileSidebar(false)}>
             <span className="material-symbols-outlined">category</span>
             Kategoriyalar
           </Link>
-          <Link to="/admin/darslar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2">
+          <Link to="/admin/darslar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2" onClick={() => setShowMobileSidebar(false)}>
             <span className="material-symbols-outlined">school</span>
             Darslar
           </Link>
-          <Link to="/admin/foydalanuvchilar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2">
+          <Link to="/admin/foydalanuvchilar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2" onClick={() => setShowMobileSidebar(false)}>
             <span className="material-symbols-outlined">group</span>
             Foydalanuvchilar
           </Link>
-          <Link to="/admin/sms" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2">
+          <Link to="/admin/sms" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2" onClick={() => setShowMobileSidebar(false)}>
             <span className="material-symbols-outlined">sms</span>
             SMS Xabarnoma
           </Link>
         </nav>
 
         <div className="p-4 border-t border-slate-800">
-          <Link to="/bolim" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
+          <Link to="/bolim" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors" onClick={() => setShowMobileSidebar(false)}>
             <span className="material-symbols-outlined">arrow_back</span>
             Saytga qaytish
           </Link>
@@ -147,12 +157,12 @@ export function AdminBolimlar() {
 
       {/* Main Content */}
       <div className="lg:ml-64">
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-md">
           <div className="px-6 lg:px-8">
             <div className="flex items-center justify-between h-16 lg:h-20">
               <div className="flex items-center gap-4">
-                <button onClick={() => navigate('/admin')} className="lg:hidden p-2 hover:bg-slate-100 rounded-xl">
-                  <span className="material-symbols-outlined">arrow_back</span>
+                <button onClick={() => setShowMobileSidebar(true)} className="lg:hidden p-2 hover:bg-slate-100 rounded-xl">
+                  <span className="material-symbols-outlined">menu</span>
                 </button>
                 <div>
                   <h1 className="text-xl font-bold text-slate-900">Bo'limlar</h1>
@@ -334,6 +344,26 @@ export function AdminBolimlar() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Error Modal */}
+      {errorModal.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setErrorModal({ show: false, message: '' })} />
+          <div className="relative bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-3xl text-red-600">error</span>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Xatolik</h3>
+            <p className="text-slate-600 text-sm mb-6">{errorModal.message}</p>
+            <button
+              onClick={() => setErrorModal({ show: false, message: '' })}
+              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold"
+            >
+              Tushundim
+            </button>
           </div>
         </div>
       )}

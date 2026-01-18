@@ -70,7 +70,7 @@ export function Kategoriyalar() {
   return (
     <div className="min-h-screen bg-slate-50 font-display">
       {/* Header */}
-      <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
+      <header className="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20">
             <div className="flex items-center gap-2 sm:gap-3">
@@ -167,7 +167,7 @@ export function Kategoriyalar() {
                   <div
                     key={category.id}
                     onClick={() => setShowSubscriptionModal(true)}
-                    className="group bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-sm border border-slate-100 relative overflow-hidden cursor-pointer opacity-75 hover:opacity-100 transition-opacity"
+                    className="group bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-md border border-slate-100 relative overflow-hidden cursor-pointer opacity-75 hover:opacity-100 transition-opacity"
                   >
                     {/* Lock overlay */}
                     <div className="absolute inset-0 bg-slate-900/5 z-10 flex items-center justify-center">
@@ -202,7 +202,7 @@ export function Kategoriyalar() {
                 <Link
                   key={category.id}
                   to={`/kategoriya/${category.id}`}
-                  className="group bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 relative overflow-hidden"
+                  className="group bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-md hover:shadow-xl transition-all duration-300 border border-slate-100 relative overflow-hidden"
                 >
                   <div className={`absolute top-0 right-0 w-24 sm:w-40 h-24 sm:h-40 ${colorClasses[category.color]?.bg || 'bg-emerald-500'} opacity-5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500`}></div>
                   
@@ -213,12 +213,17 @@ export function Kategoriyalar() {
                     </div>
                   )}
                   
-                  <div className={`w-10 h-10 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${colorClasses[category.color]?.gradient || 'from-emerald-500 to-emerald-600'} flex items-center justify-center text-white mb-3 sm:mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
-                    <span className="material-symbols-outlined text-xl sm:text-3xl">{category.icon}</span>
+                  {/* Icon and Content - Horizontal Layout */}
+                  <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-6">
+                    <div className={`w-10 h-10 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${colorClasses[category.color]?.gradient || 'from-emerald-500 to-emerald-600'} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform shrink-0`}>
+                      <span className="material-symbols-outlined text-xl sm:text-3xl">{category.icon}</span>
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm sm:text-xl font-bold text-slate-900 mb-1 sm:mb-2 group-hover:text-primary transition-colors">{category.name}</h3>
+                      <p className="text-slate-600 text-xs sm:text-base line-clamp-2">{category.description}</p>
+                    </div>
                   </div>
-                  
-                  <h3 className="text-sm sm:text-xl font-bold text-slate-900 mb-1 sm:mb-2 group-hover:text-primary transition-colors">{category.name}</h3>
-                  <p className="text-slate-600 mb-3 sm:mb-6 text-xs sm:text-base line-clamp-2">{category.description}</p>
                   
                   <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-slate-100">
                     <div className="flex items-center gap-1 sm:gap-2 text-slate-500">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { usersAPI } from '../../api';
 
 interface User {
@@ -13,7 +13,6 @@ interface User {
 }
 
 export function AdminFoydalanuvchilar() {
-  const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -21,6 +20,8 @@ export function AdminFoydalanuvchilar() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [days, setDays] = useState(30);
   const [saving, setSaving] = useState(false);
+  const [deleteModal, setDeleteModal] = useState<{ show: boolean; user: User | null }>({ show: false, user: null });
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
   useEffect(() => { loadUsers(); }, []);
 
@@ -55,10 +56,11 @@ export function AdminFoydalanuvchilar() {
   };
 
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Foydalanuvchini o'chirishni tasdiqlaysizmi?")) return;
+  const handleDelete = async () => {
+    if (!deleteModal.user) return;
     try {
-      await usersAPI.delete(id);
+      await usersAPI.delete(deleteModal.user.id);
+      setDeleteModal({ show: false, user: null });
       loadUsers();
     } catch (err) { console.error(err); }
   };
@@ -70,8 +72,16 @@ export function AdminFoydalanuvchilar() {
 
   return (
     <div className="min-h-screen bg-slate-100 font-display">
+      {/* Mobile Sidebar Overlay */}
+      {showMobileSidebar && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setShowMobileSidebar(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-slate-900 text-white hidden lg:flex flex-col">
+      <aside className={`fixed left-0 top-0 bottom-0 w-64 bg-slate-900 text-white z-50 transition-transform duration-300 ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 flex flex-col`}>
         <div className="p-6 border-b border-slate-800">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
@@ -123,12 +133,12 @@ export function AdminFoydalanuvchilar() {
 
       {/* Main Content */}
       <div className="lg:ml-64">
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-md">
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16 lg:h-20">
               <div className="flex items-center gap-4">
-                <button onClick={() => navigate('/admin')} className="lg:hidden p-2 hover:bg-slate-100 rounded-xl">
-                  <span className="material-symbols-outlined">arrow_back</span>
+                <button onClick={() => setShowMobileSidebar(true)} className="lg:hidden p-2 hover:bg-slate-100 rounded-xl">
+                  <span className="material-symbols-outlined">menu</span>
                 </button>
                 <div>
                   <h1 className="text-lg sm:text-xl font-bold text-slate-900">Foydalanuvchilar</h1>
@@ -203,7 +213,7 @@ export function AdminFoydalanuvchilar() {
                             <button onClick={() => openSubscriptionModal(user)} className="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-xl transition-all" title="Obuna">
                               <span className="material-symbols-outlined text-xl">card_membership</span>
                             </button>
-                            <button onClick={() => handleDelete(user.id)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all" title="O'chirish">
+                            <button onClick={() => setDeleteModal({ show: true, user })} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all" title="O'chirish">
                               <span className="material-symbols-outlined text-xl">delete</span>
                             </button>
                           </div>
@@ -218,6 +228,36 @@ export function AdminFoydalanuvchilar() {
         </main>
       </div>
 
+
+      {/* Delete Modal */}
+      {deleteModal.show && deleteModal.user && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setDeleteModal({ show: false, user: null })} />
+          <div className="relative bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-3xl text-red-600">delete</span>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Foydalanuvchini o'chirish</h3>
+            <p className="text-slate-600 text-sm mb-6">
+              <strong>{deleteModal.user.fullName}</strong> ni o'chirmoqchimisiz?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteModal({ show: false, user: null })}
+                className="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200"
+              >
+                Bekor qilish
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600"
+              >
+                O'chirish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Subscription Modal */}
       {showModal && selectedUser && (

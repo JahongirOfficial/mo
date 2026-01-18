@@ -68,103 +68,141 @@ export function BoshSahifa() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-24 lg:pt-32 pb-16 lg:pb-24 overflow-hidden">
+      <section className="relative pt-20 sm:pt-24 lg:pt-28 pb-12 sm:pb-16 lg:pb-20 overflow-hidden">
         {/* Animated Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-emerald-50"></div>
-        <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-emerald-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-teal-50"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-teal-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-3xl"></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             {/* Left Content */}
-            <div className="text-center lg:text-left">
+            <div className="text-center lg:text-left space-y-4 sm:space-y-6">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 backdrop-blur-sm rounded-full text-emerald-700 font-semibold text-sm mb-6 border border-emerald-200/50 shadow-sm">
-                <span className="material-symbols-outlined text-lg">verified</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/80 backdrop-blur-sm rounded-full text-emerald-700 font-semibold text-xs sm:text-sm border border-emerald-200/50 shadow-lg hover:shadow-xl transition-shadow">
+                <span className="material-symbols-outlined text-base sm:text-lg animate-pulse">verified</span>
                 O'zbekistondagi #1 tarbiyaviy platforma
               </div>
               
               {/* Title */}
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-slate-900 mb-6 leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-slate-900 leading-tight">
                 Birgalikda farzandingizni
-                <span className="block mt-2 bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700 bg-clip-text text-transparent">
+                <span className="block mt-2 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 bg-clip-text text-transparent animate-gradient">
                   DUNYO darajasiga
                 </span>
                 olib chiqamiz
               </h1>
               
               {/* Description */}
-              <p className="text-lg lg:text-xl text-slate-600 mb-8 max-w-xl mx-auto lg:mx-0">
-                Buyuk bolalar ortidagi buyuk OTA-ONA bo'ling! 150+ video darslar, professional psixologlar maslahati.
+              <p className="text-base sm:text-lg lg:text-xl text-slate-600 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                Buyuk bolalar ortidagi buyuk <strong className="text-slate-900">OTA-ONA</strong> bo'ling! 150+ video darslar, professional psixologlar maslahati.
               </p>
               
               {/* Stats */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 mb-8">
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-emerald-600">groups</span>
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6">
+                <div className="flex items-center gap-2 sm:gap-3 group">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <span className="material-symbols-outlined text-white text-lg sm:text-xl">groups</span>
                   </div>
                   <div className="text-left">
-                    <p className="text-2xl font-bold text-slate-900">10,000+</p>
-                    <p className="text-sm text-slate-500">Foydalanuvchi</p>
+                    <p className="text-xl sm:text-2xl font-bold text-slate-900">10,000+</p>
+                    <p className="text-xs sm:text-sm text-slate-500">Foydalanuvchi</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-emerald-600">play_circle</span>
+                <div className="flex items-center gap-2 sm:gap-3 group">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <span className="material-symbols-outlined text-white text-lg sm:text-xl">play_circle</span>
                   </div>
                   <div className="text-left">
-                    <p className="text-2xl font-bold text-slate-900">150+</p>
-                    <p className="text-sm text-slate-500">Video dars</p>
+                    <p className="text-xl sm:text-2xl font-bold text-slate-900">150+</p>
+                    <p className="text-xs sm:text-sm text-slate-500">Video dars</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-emerald-600" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                <div className="flex items-center gap-2 sm:gap-3 group">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <span className="material-symbols-outlined text-white text-lg sm:text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                   </div>
                   <div className="text-left">
-                    <p className="text-2xl font-bold text-slate-900">4.9/5</p>
-                    <p className="text-sm text-slate-500">Reyting</p>
+                    <p className="text-xl sm:text-2xl font-bold text-slate-900">4.9/5</p>
+                    <p className="text-xs sm:text-sm text-slate-500">Reyting</p>
                   </div>
                 </div>
               </div>
               
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start pt-2 sm:pt-4">
                 <Link 
                   to="/kirish?tab=register" 
-                  className="group px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-bold text-lg hover:shadow-xl hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2"
+                  className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 text-white rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg hover:shadow-2xl hover:shadow-emerald-500/40 transition-all overflow-hidden"
                 >
-                  Bepul boshlash
-                  <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    Bepul boshlash
+                    <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-teal-600 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </Link>
                 <a 
                   href="#features" 
-                  className="px-8 py-4 bg-white text-slate-700 rounded-xl font-bold text-lg border-2 border-slate-200 hover:border-emerald-500 hover:text-emerald-600 transition-all flex items-center justify-center gap-2 shadow-sm"
+                  className="group px-6 py-3 sm:px-8 sm:py-4 bg-white text-slate-700 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg border-2 border-slate-200 hover:border-emerald-500 hover:text-emerald-600 hover:shadow-xl transition-all flex items-center justify-center gap-2"
                 >
-                  <span className="material-symbols-outlined">play_circle</span>
+                  <span className="material-symbols-outlined group-hover:scale-110 transition-transform">play_circle</span>
                   Video ko'rish
                 </a>
+              </div>
+              
+              {/* Trust Badges */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-2 sm:pt-4 text-xs sm:text-sm text-slate-500">
+                <div className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-emerald-600 text-base sm:text-lg">check_circle</span>
+                  Kredit karta kerak emas
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-emerald-600 text-base sm:text-lg">check_circle</span>
+                  7 kun bepul sinov
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-emerald-600 text-base sm:text-lg">check_circle</span>
+                  Istalgan vaqt bekor qilish
+                </div>
               </div>
             </div>
             
             {/* Right Image */}
             <div className="relative hidden lg:block">
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 rounded-3xl blur-3xl"></div>
-              <img 
-                src="https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=600&h=600&fit=crop" 
-                alt="Ona va bola" 
-                className="relative rounded-3xl shadow-2xl shadow-slate-900/20 hover:scale-105 transition-transform duration-500"
-              />
-              {/* Floating Card */}
-              <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-xl border border-slate-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-emerald-600 text-2xl">psychology</span>
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/30 to-teal-600/30 rounded-3xl blur-3xl animate-pulse"></div>
+              
+              {/* Main Image */}
+              <div className="relative">
+                <img 
+                  src="https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=600&h=600&fit=crop" 
+                  alt="Ona va bola" 
+                  className="relative rounded-3xl shadow-2xl shadow-slate-900/20 hover:scale-[1.02] transition-transform duration-700 border-4 border-white"
+                />
+                
+                {/* Floating Cards - Kichikroq */}
+                <div className="absolute -bottom-6 -left-6 bg-white rounded-xl p-4 shadow-2xl border border-slate-100 hover:scale-105 transition-transform">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg">
+                      <span className="material-symbols-outlined text-white text-xl">psychology</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900">Professional</p>
+                      <p className="text-xs text-slate-500">Psixologlar</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-bold text-slate-900">Professional</p>
-                    <p className="text-sm text-slate-500">Psixologlar</p>
+                </div>
+                
+                <div className="absolute -top-6 -right-6 bg-white rounded-xl p-4 shadow-2xl border border-slate-100 hover:scale-105 transition-transform">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg">
+                      <span className="material-symbols-outlined text-white text-xl">workspace_premium</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900">Sertifikat</p>
+                      <p className="text-xs text-slate-500">Tugagach</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -182,23 +220,28 @@ export function BoshSahifa() {
             <p className="text-sm sm:text-lg text-slate-600 max-w-2xl mx-auto">Farzandingiz yoshiga mos darslarni tanlang</p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
             {sections.length > 0 ? sections.map((section, i) => (
                 <div 
                   key={section.id || i} 
-                  className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 overflow-hidden"
+                  className="group relative bg-white rounded-2xl p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 overflow-hidden"
                 >
                   {/* Background decoration */}
                   <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500 opacity-5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500"></div>
                   
-                  {/* Icon */}
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${section.color || 'from-emerald-500 to-emerald-600'} flex items-center justify-center text-white mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
-                    <span className="material-symbols-outlined text-2xl">{section.icon || 'folder'}</span>
+                  {/* Icon and Content - Horizontal Layout */}
+                  <div className="flex items-center gap-4 mb-4">
+                    {/* Icon */}
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${section.color || 'from-emerald-500 to-emerald-600'} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform shrink-0`}>
+                      <span className="material-symbols-outlined text-2xl">{section.icon || 'folder'}</span>
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-emerald-600 transition-colors">{section.name}</h3>
+                      <p className="text-sm text-slate-500">{section.categoryCount || 0} ta kategoriya</p>
+                    </div>
                   </div>
-                  
-                  {/* Content */}
-                  <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-emerald-600 transition-colors">{section.name}</h3>
-                  <p className="text-sm text-slate-500 mb-4">{section.categoryCount || 0} ta kategoriya</p>
                   
                   {/* Arrow */}
                   <div className="flex items-center justify-end">
@@ -210,7 +253,7 @@ export function BoshSahifa() {
               )) : (
               // Skeleton loader
               [...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 animate-pulse">
+                <div key={i} className="bg-white rounded-2xl p-6 shadow-md border border-slate-100 animate-pulse">
                   <div className="w-14 h-14 rounded-2xl bg-slate-200 mb-4"></div>
                   <div className="h-5 bg-slate-200 rounded w-3/4 mb-2"></div>
                   <div className="h-4 bg-slate-100 rounded w-1/2"></div>
@@ -239,7 +282,7 @@ export function BoshSahifa() {
           
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
             {features.map((f, i) => (
-              <div key={i} className="group bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100">
+              <div key={i} className="group bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-md hover:shadow-xl transition-all duration-300 border border-slate-100">
                 <div className={`w-10 h-10 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center text-white mb-3 sm:mb-6 group-hover:scale-110 transition-transform shadow-lg`}>
                   <span className="material-symbols-outlined text-xl sm:text-3xl">{f.icon}</span>
                 </div>

@@ -157,7 +157,7 @@ export function KategoriyaBolimi() {
   return (
     <div className="min-h-screen bg-slate-50 font-display">
       {/* Header */}
-      <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
+      <header className="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-md">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center h-14 sm:h-16 gap-3">
             <button onClick={() => navigate('/bolim')} className="p-2.5 sm:p-3 hover:bg-slate-100 rounded-xl transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
@@ -176,9 +176,6 @@ export function KategoriyaBolimi() {
                 <span>{subscription.daysLeft} kun</span>
               </div>
             )}
-            <Link to="/bolim" className="p-2.5 sm:p-3 hover:bg-slate-100 rounded-xl transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
-              <span className="material-symbols-outlined text-slate-600">home</span>
-            </Link>
             <button 
               onClick={handleLogout}
               className="p-2.5 sm:p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -225,8 +222,9 @@ export function KategoriyaBolimi() {
             <p className="text-base sm:text-xl text-slate-500">Bu bo'limda hali kategoriyalar yo'q</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {section.categories.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0)).map((category, catIndex) => {
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {section.categories.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0)).map((category, catIndex) => {
               const catColors = colorClasses[category.color] || colorClasses.green;
               const isExpanded = expandedCategory === category.id;
               const lessons = categoryLessons[category.id] || [];
@@ -246,7 +244,7 @@ export function KategoriyaBolimi() {
               return (
                 <div key={category.id}>
                   {/* Category Card */}
-                  <div className={`bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden transition-all ${isPaused ? 'opacity-60' : 'hover:shadow-lg hover:border-emerald-200'}`}>
+                  <div className={`bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden transition-all ${isPaused ? 'opacity-60' : 'hover:shadow-xl hover:border-emerald-200'}`}>
                     <button
                       onClick={handleCategoryClick}
                       className="w-full p-5 text-left"
@@ -260,17 +258,20 @@ export function KategoriyaBolimi() {
                         </div>
                       )}
                       
-                      {/* Icon */}
-                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${isPaused ? 'from-slate-400 to-slate-500 grayscale' : catColors.gradient} flex items-center justify-center text-white shadow-md mb-4 transition-transform ${!isPaused && 'hover:scale-110'}`}>
-                        <span className="material-symbols-outlined text-2xl">{isPaused ? 'lock' : category.icon}</span>
-                      </div>
-                      
-                      {/* Content */}
-                      <div className="space-y-2 mb-4">
-                        <h4 className={`font-bold text-base ${isPaused ? 'text-slate-500' : 'text-slate-800'}`}>
-                          {category.name}
-                        </h4>
-                        <p className="text-sm text-slate-500 line-clamp-2">{category.description}</p>
+                      {/* Icon and Content - Horizontal Layout */}
+                      <div className="flex items-center gap-4 mb-4">
+                        {/* Icon */}
+                        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${isPaused ? 'from-slate-400 to-slate-500 grayscale' : catColors.gradient} flex items-center justify-center text-white shadow-md transition-transform ${!isPaused && 'hover:scale-110'} shrink-0`}>
+                          <span className="material-symbols-outlined text-2xl">{isPaused ? 'lock' : category.icon}</span>
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="space-y-2 flex-1 min-w-0">
+                          <h4 className={`font-bold text-base ${isPaused ? 'text-slate-500' : 'text-slate-800'}`}>
+                            {category.name}
+                          </h4>
+                          <p className="text-sm text-slate-500 line-clamp-2">{category.description}</p>
+                        </div>
                       </div>
                       
                       {/* Footer */}
@@ -292,7 +293,7 @@ export function KategoriyaBolimi() {
                   
                   {/* Lessons Dropdown - Full Width Below Card */}
                   {isExpanded && !isPaused && (
-                    <div className="mt-3 bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+                    <div className="mt-3 bg-white rounded-2xl shadow-md border border-slate-100 p-4">
                       {loadingLessons === category.id ? (
                         <div className="space-y-2">
                           {[1, 2, 3].map((i) => (
@@ -343,44 +344,55 @@ export function KategoriyaBolimi() {
                 </div>
               );
             })}
+            </div>
 
-            {/* 20 ta Dolzarb Muammo - Special Module */}
-            <Link 
-              to="/muammolar"
-              className="group relative bg-white rounded-2xl p-5 shadow-sm border border-slate-100 transition-all duration-300 hover:shadow-lg hover:border-emerald-200 hover:-translate-y-1"
-            >
-              {/* Special Badge */}
-              <div className="absolute top-3 right-3 px-2 py-1 bg-amber-100 rounded-full">
-                <span className="text-[10px] font-bold text-amber-700">Maxsus</span>
-              </div>
-              
-              {/* Icon */}
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white shadow-md mb-4 group-hover:scale-110 transition-transform duration-300">
-                <span className="material-symbols-outlined text-2xl">lightbulb</span>
-              </div>
-              
-              {/* Content */}
-              <div className="space-y-1 mb-4">
-                <h4 className="font-bold text-base text-slate-800 group-hover:text-emerald-600 transition-colors">
-                  20 ta Dolzarb Muammo va Yechimlar
-                </h4>
-                <p className="text-sm text-slate-500 line-clamp-2">
-                  Eng ko'p uchraydigan muammolar va ularning amaliy yechimlari
-                </p>
-              </div>
-              
-              {/* Footer */}
-              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                <div className="flex items-center gap-1.5 text-slate-500">
-                  <span className="material-symbols-outlined text-lg">quiz</span>
-                  <span className="text-sm font-medium">20 ta muammo</span>
+            {/* 20 ta Dolzarb Muammo - Faqat "Ota-ona shaxsiy rivojlanishi" bo'limida */}
+            {section.name === "Ota-ona shaxsiy rivojlanishi" && (
+              <Link 
+                to="/muammolar"
+                className="group relative bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 shadow-sm border-2 border-amber-200 transition-all duration-300 hover:shadow-xl hover:border-amber-300 hover:-translate-y-1 mt-6 block overflow-hidden"
+              >
+                {/* Background decoration */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400 opacity-10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500"></div>
+                
+                <div className="relative z-10">
+                  {/* Special Badge */}
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 text-white rounded-full mb-4 shadow-sm">
+                    <span className="material-symbols-outlined text-sm">star</span>
+                    <span className="text-xs font-bold">Maxsus</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-4 mb-4">
+                    {/* Icon */}
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300 shrink-0">
+                      <span className="material-symbols-outlined text-3xl">lightbulb</span>
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-lg text-slate-900 group-hover:text-amber-700 transition-colors mb-1">
+                        20 ta Dolzarb Muammo va Yechimlar
+                      </h4>
+                      <p className="text-sm text-slate-600">
+                        Eng ko'p uchraydigan muammolar va yechimlari
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Footer */}
+                  <div className="flex items-center justify-between pt-4 border-t border-amber-200">
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <span className="material-symbols-outlined text-lg">quiz</span>
+                      <span className="text-sm font-medium">20 ta muammo</span>
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1">
+                      <span className="material-symbols-outlined text-white text-lg">arrow_forward</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1">
-                  <span className="material-symbols-outlined text-emerald-600 text-lg">arrow_forward</span>
-                </div>
-              </div>
-            </Link>
-          </div>
+              </Link>
+            )}
+          </>
         )}
       </main>
 

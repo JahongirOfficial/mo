@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { categoriesAPI, sectionsAPI } from '../../api';
 
 interface Category {
@@ -73,7 +73,6 @@ const colors = [
 ];
 
 export function AdminKategoriyalar() {
-  const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,6 +80,8 @@ export function AdminKategoriyalar() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ sectionId: '', name: '', description: '', icon: 'category', color: 'green', orderIndex: 0, status: 'active' as 'active' | 'pause' });
   const [saving, setSaving] = useState(false);
+  const [deleteModal, setDeleteModal] = useState<{ show: boolean; category: Category | null }>({ show: false, category: null });
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -130,10 +131,11 @@ export function AdminKategoriyalar() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Kategoriyani o'chirishni tasdiqlaysizmi? Barcha darslar ham o'chiriladi!")) return;
+  const handleDelete = async () => {
+    if (!deleteModal.category) return;
     try {
-      await categoriesAPI.delete(id);
+      await categoriesAPI.delete(deleteModal.category.id);
+      setDeleteModal({ show: false, category: null });
       loadData();
     } catch (err) {
       console.error(err);
@@ -161,8 +163,16 @@ export function AdminKategoriyalar() {
 
   return (
     <div className="min-h-screen bg-slate-100 font-display">
+      {/* Mobile Sidebar Overlay */}
+      {showMobileSidebar && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setShowMobileSidebar(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-slate-900 text-white hidden lg:flex flex-col">
+      <aside className={`fixed left-0 top-0 bottom-0 w-64 bg-slate-900 text-white z-50 transition-transform duration-300 ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 flex flex-col`}>
         <div className="p-6 border-b border-slate-800">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
@@ -213,12 +223,12 @@ export function AdminKategoriyalar() {
 
       {/* Main Content */}
       <div className="lg:ml-64">
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-md">
           <div className="px-6 lg:px-8">
             <div className="flex items-center justify-between h-16 lg:h-20">
               <div className="flex items-center gap-4">
-                <button onClick={() => navigate('/admin')} className="lg:hidden p-2 hover:bg-slate-100 rounded-xl">
-                  <span className="material-symbols-outlined">arrow_back</span>
+                <button onClick={() => setShowMobileSidebar(true)} className="lg:hidden p-2 hover:bg-slate-100 rounded-xl">
+                  <span className="material-symbols-outlined">menu</span>
                 </button>
                 <div>
                   <h1 className="text-xl font-bold text-slate-900">Kategoriyalar</h1>
@@ -291,7 +301,7 @@ export function AdminKategoriyalar() {
                             <button onClick={() => openModal(cat)} className="p-2.5 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-xl transition-all">
                               <span className="material-symbols-outlined">edit</span>
                             </button>
-                            <button onClick={() => handleDelete(cat.id)} className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                            <button onClick={() => setDeleteModal({ show: true, category: cat })} className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
                               <span className="material-symbols-outlined">delete</span>
                             </button>
                           </div>
@@ -305,6 +315,41 @@ export function AdminKategoriyalar() {
           )}
         </main>
       </div>
+
+      {/* Delete Modal */}
+      {deleteModal.show && deleteModal.category && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setDeleteModal({ show: false, category: null })} />
+          <div className="relative bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-3xl text-red-600">delete</span>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Kategoriyani o'chirish</h3>
+            <p className="text-slate-600 text-sm mb-2">
+              <strong>{deleteModal.category.name}</strong> kategoriyasini o'chirmoqchimisiz?
+            </p>
+            {deleteModal.category.lessonCount > 0 && (
+              <p className="text-red-600 text-sm mb-6">
+                Diqqat: <strong>{deleteModal.category.lessonCount} ta dars</strong> ham o'chiriladi!
+              </p>
+            )}
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setDeleteModal({ show: false, category: null })}
+                className="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200"
+              >
+                Bekor qilish
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600"
+              >
+                O'chirish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal */}
       {showModal && (

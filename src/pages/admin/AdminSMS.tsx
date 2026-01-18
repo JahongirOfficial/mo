@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { usersAPI } from '../../api';
 
 interface User {
@@ -11,13 +11,14 @@ interface User {
 }
 
 export function AdminSMS() {
-  const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [message, setMessage] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [errorModal, setErrorModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
   useEffect(() => { loadUsers(); }, []);
 
@@ -61,11 +62,11 @@ export function AdminSMS() {
 
   const handleSendSMS = () => {
     if (!message.trim()) {
-      alert("Xabar matnini kiriting!");
+      setErrorModal({ show: true, message: "Xabar matnini kiriting!" });
       return;
     }
     if (selectedUsers.length === 0) {
-      alert("Kamida bitta foydalanuvchi tanlang!");
+      setErrorModal({ show: true, message: "Kamida bitta foydalanuvchi tanlang!" });
       return;
     }
 
@@ -78,8 +79,16 @@ export function AdminSMS() {
 
   return (
     <div className="min-h-screen bg-slate-100 font-display">
+      {/* Mobile Sidebar Overlay */}
+      {showMobileSidebar && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setShowMobileSidebar(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-slate-900 text-white hidden lg:flex flex-col">
+      <aside className={`fixed left-0 top-0 bottom-0 w-64 bg-slate-900 text-white z-50 transition-transform duration-300 ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 flex flex-col`}>
         <div className="p-6 border-b border-slate-800">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
@@ -130,12 +139,12 @@ export function AdminSMS() {
 
       {/* Main Content */}
       <div className="lg:ml-64">
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-md">
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16 lg:h-20">
               <div className="flex items-center gap-4">
-                <button onClick={() => navigate('/admin')} className="lg:hidden p-2 hover:bg-slate-100 rounded-xl">
-                  <span className="material-symbols-outlined">arrow_back</span>
+                <button onClick={() => setShowMobileSidebar(true)} className="lg:hidden p-2 hover:bg-slate-100 rounded-xl">
+                  <span className="material-symbols-outlined">menu</span>
                 </button>
                 <div>
                   <h1 className="text-lg sm:text-xl font-bold text-slate-900">SMS Xabarnoma</h1>
@@ -259,6 +268,26 @@ export function AdminSMS() {
           )}
         </main>
       </div>
+
+      {/* Error Modal */}
+      {errorModal.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setErrorModal({ show: false, message: '' })} />
+          <div className="relative bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
+            <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-3xl text-amber-600">warning</span>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Diqqat</h3>
+            <p className="text-slate-600 text-sm mb-6">{errorModal.message}</p>
+            <button
+              onClick={() => setErrorModal({ show: false, message: '' })}
+              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold"
+            >
+              Tushundim
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

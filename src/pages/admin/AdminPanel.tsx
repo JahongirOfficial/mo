@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { sectionsAPI, categoriesAPI, lessonsAPI } from '../../api';
 
 export function AdminPanel() {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
   const [stats, setStats] = useState({ sections: 0, categories: 0, lessons: 0 });
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
   useEffect(() => {
     loadStats();
@@ -61,8 +61,16 @@ export function AdminPanel() {
 
   return (
     <div className="min-h-screen bg-slate-100 font-display">
+      {/* Mobile Sidebar Overlay */}
+      {showMobileSidebar && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setShowMobileSidebar(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-slate-900 text-white hidden lg:flex flex-col">
+      <aside className={`fixed left-0 top-0 bottom-0 w-64 bg-slate-900 text-white z-50 transition-transform duration-300 ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 flex flex-col`}>
         <div className="p-6 border-b border-slate-800">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
@@ -77,34 +85,34 @@ export function AdminPanel() {
         
         <nav className="flex-1 p-4">
           <p className="text-xs text-slate-500 uppercase tracking-wider mb-3 px-3">Boshqaruv</p>
-          <Link to="/admin" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800 text-white mb-2">
+          <Link to="/admin" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800 text-white mb-2" onClick={() => setShowMobileSidebar(false)}>
             <span className="material-symbols-outlined">dashboard</span>
             Dashboard
           </Link>
-          <Link to="/admin/bolimlar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2">
+          <Link to="/admin/bolimlar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2" onClick={() => setShowMobileSidebar(false)}>
             <span className="material-symbols-outlined">folder</span>
             Bo'limlar
           </Link>
-          <Link to="/admin/kategoriyalar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2">
+          <Link to="/admin/kategoriyalar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2" onClick={() => setShowMobileSidebar(false)}>
             <span className="material-symbols-outlined">category</span>
             Kategoriyalar
           </Link>
-          <Link to="/admin/darslar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2">
+          <Link to="/admin/darslar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2" onClick={() => setShowMobileSidebar(false)}>
             <span className="material-symbols-outlined">school</span>
             Darslar
           </Link>
-          <Link to="/admin/foydalanuvchilar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2">
+          <Link to="/admin/foydalanuvchilar" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2" onClick={() => setShowMobileSidebar(false)}>
             <span className="material-symbols-outlined">group</span>
             Foydalanuvchilar
           </Link>
-          <Link to="/admin/sms" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2">
+          <Link to="/admin/sms" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors mb-2" onClick={() => setShowMobileSidebar(false)}>
             <span className="material-symbols-outlined">sms</span>
             SMS Xabarnoma
           </Link>
         </nav>
 
         <div className="p-4 border-t border-slate-800">
-          <Link to="/bolim" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors">
+          <Link to="/bolim" className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors" onClick={() => setShowMobileSidebar(false)}>
             <span className="material-symbols-outlined">arrow_back</span>
             Saytga qaytish
           </Link>
@@ -114,11 +122,11 @@ export function AdminPanel() {
       {/* Main Content */}
       <div className="lg:ml-64">
         {/* Header */}
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-md">
           <div className="px-6 lg:px-8">
             <div className="flex items-center justify-between h-16 lg:h-20">
               <div className="flex items-center gap-4">
-                <button onClick={() => navigate('/bolim')} className="lg:hidden p-2 hover:bg-slate-100 rounded-xl">
+                <button onClick={() => setShowMobileSidebar(true)} className="lg:hidden p-2 hover:bg-slate-100 rounded-xl">
                   <span className="material-symbols-outlined">menu</span>
                 </button>
                 <div>
@@ -146,43 +154,51 @@ export function AdminPanel() {
           {/* Stats */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-2xl">folder</span>
                 </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-3xl font-bold text-slate-900 mb-1">{stats.sections}</p>
+                  <p className="text-slate-500">Bo'limlar</p>
+                </div>
               </div>
-              <p className="text-3xl font-bold text-slate-900 mb-1">{stats.sections}</p>
-              <p className="text-slate-500">Bo'limlar</p>
             </div>
             
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-2xl">category</span>
                 </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-3xl font-bold text-slate-900 mb-1">{stats.categories}</p>
+                  <p className="text-slate-500">Kategoriyalar</p>
+                </div>
               </div>
-              <p className="text-3xl font-bold text-slate-900 mb-1">{stats.categories}</p>
-              <p className="text-slate-500">Kategoriyalar</p>
             </div>
             
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-2xl">school</span>
                 </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-3xl font-bold text-slate-900 mb-1">{stats.lessons}</p>
+                  <p className="text-slate-500">Darslar</p>
+                </div>
               </div>
-              <p className="text-3xl font-bold text-slate-900 mb-1">{stats.lessons}</p>
-              <p className="text-slate-500">Darslar</p>
             </div>
             
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-2xl">group</span>
                 </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-3xl font-bold text-slate-900 mb-1">-</p>
+                  <p className="text-slate-500">Foydalanuvchilar</p>
+                </div>
               </div>
-              <p className="text-3xl font-bold text-slate-900 mb-1">-</p>
-              <p className="text-slate-500">Foydalanuvchilar</p>
             </div>
           </div>
 

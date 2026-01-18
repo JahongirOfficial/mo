@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { categoriesAPI, lessonsAPI, uploadAPI } from '../../api';
 
 interface Category { id: string; name: string; }
@@ -10,7 +10,6 @@ interface Lesson {
 }
 
 export function AdminDarslar() {
-  const navigate = useNavigate();
   const { categoryId } = useParams();
   const [categories, setCategories] = useState<Category[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -23,6 +22,9 @@ export function AdminDarslar() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [deleteModal, setDeleteModal] = useState<{ show: boolean; lesson: Lesson | null }>({ show: false, lesson: null });
+  const [errorModal, setErrorModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
   useEffect(() => { loadData(); }, []);
   useEffect(() => { loadLessons(); }, [selectedCategory]);
@@ -63,7 +65,7 @@ export function AdminDarslar() {
       setForm({ ...form, videoUrl: res.data.videoUrl });
       setUploadProgress(100);
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Video yuklashda xatolik');
+      setErrorModal({ show: true, message: err.response?.data?.error || 'Video yuklashda xatolik' });
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -82,10 +84,13 @@ export function AdminDarslar() {
     finally { setSaving(false); }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Darsni o'chirishni tasdiqlaysizmi?")) return;
-    try { await lessonsAPI.delete(id); loadLessons(); }
-    catch (err) { console.error(err); }
+  const handleDelete = async () => {
+    if (!deleteModal.lesson) return;
+    try {
+      await lessonsAPI.delete(deleteModal.lesson.id);
+      setDeleteModal({ show: false, lesson: null });
+      loadLessons();
+    } catch (err) { console.error(err); }
   };
 
   const typeConfig: Record<string, { icon: string; label: string; color: string }> = {
@@ -96,7 +101,16 @@ export function AdminDarslar() {
 
   return (
     <div className="min-h-screen bg-slate-100 font-display">
-      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-slate-900 text-white hidden lg:flex flex-col">
+      {/* Mobile Sidebar Overlay */}
+      {showMobileSidebar && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setShowMobileSidebar(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`fixed left-0 top-0 bottom-0 w-64 bg-slate-900 text-white z-50 transition-transform duration-300 ${showMobileSidebar ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 flex flex-col`}>
         <div className="p-6 border-b border-slate-800">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
@@ -121,11 +135,11 @@ export function AdminDarslar() {
 
 
       <div className="lg:ml-64">
-        <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-md">
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16 lg:h-20">
               <div className="flex items-center gap-4">
-                <button onClick={() => navigate('/admin')} className="lg:hidden p-2 hover:bg-slate-100 rounded-xl"><span className="material-symbols-outlined">arrow_back</span></button>
+                <button onClick={() => setShowMobileSidebar(true)} className="lg:hidden p-2 hover:bg-slate-100 rounded-xl"><span className="material-symbols-outlined">menu</span></button>
                 <div><h1 className="text-lg sm:text-xl font-bold text-slate-900">Darslar</h1><p className="text-xs sm:text-sm text-slate-500">{lessons.length} ta dars</p></div>
               </div>
               <button onClick={() => openModal()} className="flex items-center gap-2 px-4 sm:px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all text-sm sm:text-base">
@@ -179,7 +193,7 @@ export function AdminDarslar() {
                           <td className="px-4 sm:px-6 py-4">
                             <div className="flex items-center justify-end gap-1">
                               <button onClick={() => openModal(lesson)} className="p-2 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-xl"><span className="material-symbols-outlined text-xl">edit</span></button>
-                              <button onClick={() => handleDelete(lesson.id)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl"><span className="material-symbols-outlined text-xl">delete</span></button>
+                              <button onClick={() => setDeleteModal({ show: true, lesson })} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl"><span className="material-symbols-outlined text-xl">delete</span></button>
                             </div>
                           </td>
                         </tr>
@@ -193,6 +207,56 @@ export function AdminDarslar() {
         </main>
       </div>
 
+
+      {/* Delete Modal */}
+      {deleteModal.show && deleteModal.lesson && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setDeleteModal({ show: false, lesson: null })} />
+          <div className="relative bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-3xl text-red-600">delete</span>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Darsni o'chirish</h3>
+            <p className="text-slate-600 text-sm mb-6">
+              <strong>{deleteModal.lesson.title}</strong> darsini o'chirmoqchimisiz?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteModal({ show: false, lesson: null })}
+                className="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200"
+              >
+                Bekor qilish
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600"
+              >
+                O'chirish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error Modal */}
+      {errorModal.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setErrorModal({ show: false, message: '' })} />
+          <div className="relative bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-3xl text-red-600">error</span>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Xatolik</h3>
+            <p className="text-slate-600 text-sm mb-6">{errorModal.message}</p>
+            <button
+              onClick={() => setErrorModal({ show: false, message: '' })}
+              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold"
+            >
+              Tushundim
+            </button>
+          </div>
+        </div>
+      )}
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

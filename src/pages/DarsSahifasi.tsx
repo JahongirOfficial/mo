@@ -186,7 +186,7 @@ export function DarsSahifasi() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-display">
-      <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
+      <header className="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-md">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-14 sm:h-16 lg:h-20 gap-3">
             <button onClick={() => navigate('/bolim')} className="p-2 hover:bg-slate-100 rounded-xl">

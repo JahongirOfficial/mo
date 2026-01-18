@@ -50,7 +50,7 @@ export function ToifaTanlash() {
   return (
     <div className="min-h-screen bg-slate-50 font-display">
       {/* Header */}
-      <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
+      <header className="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20">
             <div className="flex items-center gap-2 sm:gap-3">
@@ -98,7 +98,7 @@ export function ToifaTanlash() {
             <Link
               key={toifa.id}
               to={`/bolim`}
-              className="group flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3 sm:py-4 bg-white shadow-sm hover:shadow-md transition-all duration-300 border-y border-slate-100 hover:bg-emerald-50"
+              className="group flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3 sm:py-4 bg-white shadow-md hover:shadow-lg transition-all duration-300 border-y border-slate-100 hover:bg-emerald-50"
             >
               <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br ${toifa.color} flex items-center justify-center text-white shadow`}>
                 <span className="material-symbols-outlined text-lg sm:text-xl">{toifa.icon}</span>

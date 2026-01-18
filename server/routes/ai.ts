@@ -310,21 +310,39 @@ Bu ma'lumotlarni hisobga olib, shaxsiylashtirilgan javob ber.`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+        model: 'llama-3.3-70b-versatile', // Groq da eng yaxshi model (yangilangan)
         messages: [
           { role: 'system', content: SYSTEM_PROMPT + userContext },
           ...contextMessages
         ],
-        max_tokens: 2048, // Ko'proq batafsil javoblar uchun
+        max_tokens: 1500, // Token limitini kamaytirdik
         temperature: 0.7,
       }),
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('Groq API xatosi:', error);
+      const errorText = await response.text();
+      console.error('Groq API xatosi:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      });
+      
+      // Tarixni saqlash (user xabari saqlansin)
       await history.save();
-      return res.status(500).json({ error: 'AI javob bera olmadi' });
+      
+      // Foydalanuvchiga tushunarli xabar
+      let errorMessage = 'AI hozirda javob bera olmayapti. Iltimos, keyinroq urinib ko\'ring.';
+      
+      if (response.status === 429) {
+        errorMessage = 'Juda ko\'p so\'rov yuborildi. Iltimos, bir oz kuting va qayta urinib ko\'ring.';
+      } else if (response.status === 401) {
+        errorMessage = 'AI xizmati sozlanmagan. Iltimos, admin bilan bog\'laning.';
+      } else if (response.status === 400) {
+        errorMessage = 'Xabar formati noto\'g\'ri. Iltimos, qayta urinib ko\'ring.';
+      }
+      
+      return res.status(500).json({ error: errorMessage });
     }
 
     const data = await response.json();
@@ -341,38 +359,76 @@ Bu ma'lumotlarni hisobga olib, shaxsiylashtirilgan javob ber.`;
         const lastUserMessage = userMessages[userMessages.length - 1]?.content || 'Reja';
         const planTitle = lastUserMessage.substring(0, 100); // Birinchi 100 belgi
         
-        // 3 kundan keyin follow-up
-        const followUpDate = new Date();
-        followUpDate.setDate(followUpDate.getDate() + 3);
+        // Tekshirish: oxirgi 24 soat ichida shu sarlavha bilan follow-up bormi?
+        const oneDayAgo = new Date();
+        oneDayAgo.setHours(oneDayAgo.getHours() - 24);
         
-        // Yangi follow-up yaratish
-        await FollowUp.create({
+        const existingFollowUp = await FollowUp.findOne({
           userId,
           planTitle,
-          planContent: aiMessage,
-          followUpDate,
-          status: 'pending',
-          progress: [
-            { day: 1, completed: false },
-            { day: 2, completed: false },
-            { day: 3, completed: false },
-            { day: 4, completed: false },
-            { day: 5, completed: false },
-            { day: 6, completed: false },
-            { day: 7, completed: false }
-          ]
+          createdAt: { $gte: oneDayAgo },
+          status: { $in: ['pending', 'reminded'] }
         });
         
-        console.log('Follow-up yaratildi:', planTitle);
+        // Agar mavjud bo'lmasa, yangi yaratish
+        if (!existingFollowUp) {
+          // 3 kundan keyin follow-up
+          const followUpDate = new Date();
+          followUpDate.setDate(followUpDate.getDate() + 3);
+          
+          // Yangi follow-up yaratish
+          await FollowUp.create({
+            userId,
+            planTitle,
+            planContent: aiMessage,
+            followUpDate,
+            status: 'pending',
+            progress: [
+              { day: 1, completed: false },
+              { day: 2, completed: false },
+              { day: 3, completed: false },
+              { day: 4, completed: false },
+              { day: 5, completed: false },
+              { day: 6, completed: false },
+              { day: 7, completed: false }
+            ]
+          });
+          
+          console.log('Follow-up yaratildi:', planTitle);
+        } else {
+          console.log('Follow-up allaqachon mavjud:', planTitle);
+        }
       } catch (err) {
         console.error('Follow-up yaratishda xato:', err);
       }
     }
 
     res.json({ message: aiMessage, onboardingActive: false });
-  } catch (error) {
-    console.error('AI xatosi:', error);
-    res.status(500).json({ error: 'Server xatosi' });
+  } catch (error: any) {
+    console.error('AI chat xatosi:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    
+    // Agar xatolik fetch bilan bog'liq bo'lsa
+    if (error.message?.includes('fetch')) {
+      return res.status(500).json({ 
+        error: 'AI xizmatiga ulanib bo\'lmadi. Iltimos, internet aloqangizni tekshiring.' 
+      });
+    }
+    
+    // Agar xatolik database bilan bog'liq bo'lsa
+    if (error.name === 'MongoError' || error.name === 'MongooseError') {
+      return res.status(500).json({ 
+        error: 'Ma\'lumotlar bazasida xatolik. Iltimos, keyinroq urinib ko\'ring.' 
+      });
+    }
+    
+    // Umumiy xatolik
+    res.status(500).json({ 
+      error: 'Kutilmagan xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.' 
+    });
   }
 });
 
