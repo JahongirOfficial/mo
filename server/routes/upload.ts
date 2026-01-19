@@ -50,7 +50,12 @@ const upload = multer({
 });
 
 // Upload video (admin only)
-router.post('/video', isAdmin, upload.single('video'), async (req: AuthRequest, res) => {
+router.post('/video', isAdmin, (req, res, next) => {
+  // Disable timeout completely for video uploads
+  req.setTimeout(0);
+  res.setTimeout(0);
+  next();
+}, upload.single('video'), async (req: AuthRequest, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Video fayl yuklanmadi' });

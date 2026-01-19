@@ -22,6 +22,13 @@ import { authenticateToken, checkSubscription } from './middleware/auth';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Disable timeout completely for large file uploads
+app.use((req, res, next) => {
+  req.setTimeout(0); // No timeout
+  res.setTimeout(0); // No timeout
+  next();
+});
+
 app.use(cors());
 app.use(express.json({ limit: '500mb' }));
 app.use(express.urlencoded({ limit: '500mb', extended: true }));
@@ -198,7 +205,10 @@ app.use('/api/videos', authenticateToken, checkSubscription, (req, res) => {
   }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server ishga tushdi: http://localhost:${PORT}`);
   console.log(`Network: http://0.0.0.0:${PORT}`);
 });
+
+// Disable server timeout completely
+server.setTimeout(0);
