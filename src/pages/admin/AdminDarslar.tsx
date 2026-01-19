@@ -21,6 +21,8 @@ export function AdminDarslar() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadSpeed, setUploadSpeed] = useState<string>('');
+  const [uploadStartTime, setUploadStartTime] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [deleteModal, setDeleteModal] = useState<{ show: boolean; lesson: Lesson | null }>({ show: false, lesson: null });
   const [errorModal, setErrorModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
@@ -66,10 +68,23 @@ export function AdminDarslar() {
     
     setUploading(true);
     setUploadProgress(0);
+    setUploadSpeed('');
+    setUploadStartTime(Date.now());
     
     try {
       const res = await uploadAPI.uploadVideo(file, (progress) => {
         setUploadProgress(progress);
+        
+        // Calculate upload speed
+        const elapsed = (Date.now() - uploadStartTime) / 1000; // seconds
+        const uploaded = (file.size * progress) / 100; // bytes
+        const speed = uploaded / elapsed; // bytes per second
+        
+        if (speed > 1024 * 1024) {
+          setUploadSpeed(`${(speed / 1024 / 1024).toFixed(2)} MB/s`);
+        } else {
+          setUploadSpeed(`${(speed / 1024).toFixed(2)} KB/s`);
+        }
       });
       setForm({ ...form, videoUrl: res.data.videoUrl });
       setUploadProgress(100);
@@ -79,6 +94,7 @@ export function AdminDarslar() {
       setErrorModal({ show: true, message: errorMsg });
     } finally {
       setUploading(false);
+      setUploadSpeed('');
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
@@ -329,6 +345,7 @@ export function AdminDarslar() {
                         <div className="flex flex-col items-center gap-2">
                           <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin"></div>
                           <p className="text-sm text-slate-500">Yuklanmoqda... {uploadProgress}%</p>
+                          {uploadSpeed && <p className="text-xs text-slate-400">{uploadSpeed}</p>}
                         </div>
                       ) : (
                         <div className="flex flex-col items-center gap-2">

@@ -7,6 +7,7 @@ const API_URL = window.location.hostname === 'localhost' || window.location.host
 
 const api = axios.create({
   baseURL: API_URL,
+  timeout: 0, // No timeout for global instance (set per request)
 });
 
 // Simple cache
@@ -131,15 +132,32 @@ export const uploadAPI = {
   uploadVideo: (file: File, onProgress?: (progress: number) => void) => {
     const formData = new FormData();
     formData.append('video', file);
-    return api.post('/upload/video', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    
+    // Create a new axios instance without timeout for uploads
+    const uploadInstance = axios.create({
+      baseURL: API_URL,
+      timeout: 0, // No timeout
+    });
+    
+    // Add auth token
+    const token = localStorage.getItem('token');
+    if (token) {
+      uploadInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+    
+    return uploadInstance.post('/upload/video', formData, {
+      headers: { 
+        'Content-Type': 'multipart/form-data',
+      },
       onUploadProgress: (progressEvent) => {
         if (progressEvent.total) {
           const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           onProgress?.(progress);
+          console.log(`Upload progress: ${progress}% (${(progressEvent.loaded / 1024 / 1024).toFixed(2)}MB / ${(progressEvent.total / 1024 / 1024).toFixed(2)}MB)`);
         }
       },
-      timeout: 300000, // 5 minutes timeout
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity,
     });
   },
   deleteVideo: (filename: string) => api.delete(`/upload/video/${filename}`),
