@@ -57,15 +57,26 @@ export function AdminDarslar() {
     const file = e.target.files?.[0];
     if (!file) return;
     
+    // Check file size (500MB max)
+    const maxSize = 500 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setErrorModal({ show: true, message: 'Video hajmi 500MB dan oshmasligi kerak' });
+      return;
+    }
+    
     setUploading(true);
     setUploadProgress(0);
     
     try {
-      const res = await uploadAPI.uploadVideo(file);
+      const res = await uploadAPI.uploadVideo(file, (progress) => {
+        setUploadProgress(progress);
+      });
       setForm({ ...form, videoUrl: res.data.videoUrl });
       setUploadProgress(100);
     } catch (err: any) {
-      setErrorModal({ show: true, message: err.response?.data?.error || 'Video yuklashda xatolik' });
+      console.error('Upload error:', err);
+      const errorMsg = err.response?.data?.error || err.message || 'Video yuklashda xatolik';
+      setErrorModal({ show: true, message: errorMsg });
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';

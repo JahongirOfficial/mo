@@ -2,10 +2,8 @@
 
 echo "🔧 Fixing Nginx configuration for Vite SPA on 164.68.109.208..."
 
-# 1. Copy new nginx config
-echo "📋 Copying nginx configuration..."
-sudo cp nginx-fix.conf /etc/nginx/sites-available/mo
-sudo ln -sf /etc/nginx/sites-available/mo /etc/nginx/sites-enabled/mo
+# 1. Nginx config should be updated manually on server
+echo "⚠️  Update nginx config manually on server at /etc/nginx/sites-available/moo"
 
 # 2. Test nginx config
 echo "✅ Testing nginx configuration..."

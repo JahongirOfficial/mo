@@ -128,11 +128,18 @@ export const usersAPI = {
 
 // Upload
 export const uploadAPI = {
-  uploadVideo: (file: File) => {
+  uploadVideo: (file: File, onProgress?: (progress: number) => void) => {
     const formData = new FormData();
     formData.append('video', file);
     return api.post('/upload/video', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.total) {
+          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress?.(progress);
+        }
+      },
+      timeout: 300000, // 5 minutes timeout
     });
   },
   deleteVideo: (filename: string) => api.delete(`/upload/video/${filename}`),
