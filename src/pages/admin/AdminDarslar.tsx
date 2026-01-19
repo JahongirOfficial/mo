@@ -22,7 +22,7 @@ export function AdminDarslar() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadSpeed, setUploadSpeed] = useState<string>('');
-  const [uploadStartTime, setUploadStartTime] = useState<number>(0);
+  const uploadStartTimeRef = useRef<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [deleteModal, setDeleteModal] = useState<{ show: boolean; lesson: Lesson | null }>({ show: false, lesson: null });
   const [errorModal, setErrorModal] = useState<{ show: boolean; message: string }>({ show: false, message: '' });
@@ -69,21 +69,25 @@ export function AdminDarslar() {
     setUploading(true);
     setUploadProgress(0);
     setUploadSpeed('');
-    setUploadStartTime(Date.now());
+    uploadStartTimeRef.current = Date.now();
     
     try {
       const res = await uploadAPI.uploadVideo(file, (progress) => {
         setUploadProgress(progress);
         
         // Calculate upload speed
-        const elapsed = (Date.now() - uploadStartTime) / 1000; // seconds
-        const uploaded = (file.size * progress) / 100; // bytes
-        const speed = uploaded / elapsed; // bytes per second
-        
-        if (speed > 1024 * 1024) {
-          setUploadSpeed(`${(speed / 1024 / 1024).toFixed(2)} MB/s`);
-        } else {
-          setUploadSpeed(`${(speed / 1024).toFixed(2)} KB/s`);
+        const elapsed = (Date.now() - uploadStartTimeRef.current) / 1000; // seconds
+        if (elapsed > 0.5) { // Wait at least 0.5 seconds for accurate calculation
+          const uploaded = (file.size * progress) / 100; // bytes
+          const speed = uploaded / elapsed; // bytes per second
+          
+          if (speed > 1024 * 1024) {
+            setUploadSpeed(`${(speed / 1024 / 1024).toFixed(2)} MB/s`);
+          } else if (speed > 1024) {
+            setUploadSpeed(`${(speed / 1024).toFixed(2)} KB/s`);
+          } else {
+            setUploadSpeed(`${speed.toFixed(0)} B/s`);
+          }
         }
       });
       setForm({ ...form, videoUrl: res.data.videoUrl });
