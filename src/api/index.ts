@@ -136,7 +136,7 @@ export const uploadAPI = {
     // Create a new axios instance without timeout for uploads
     const uploadInstance = axios.create({
       baseURL: API_URL,
-      timeout: 0, // No timeout
+      timeout: 0, // No timeout for large uploads
     });
     
     // Add auth token
@@ -146,9 +146,9 @@ export const uploadAPI = {
     }
     
     return uploadInstance.post('/upload/video', formData, {
-      headers: { 
-        'Content-Type': 'multipart/form-data',
-      },
+      // ❌ CRITICAL: DO NOT set Content-Type manually!
+      // Axios will automatically set it with correct boundary for multipart/form-data
+      // headers: { 'Content-Type': 'multipart/form-data' }, // REMOVED
       onUploadProgress: (progressEvent) => {
         if (progressEvent.total) {
           const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);

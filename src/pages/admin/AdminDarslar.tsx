@@ -59,10 +59,10 @@ export function AdminDarslar() {
     const file = e.target.files?.[0];
     if (!file) return;
     
-    // Check file size (500MB max)
-    const maxSize = 500 * 1024 * 1024;
+    // Check file size (2GB max)
+    const maxSize = 2 * 1024 * 1024 * 1024; // 2GB
     if (file.size > maxSize) {
-      setErrorModal({ show: true, message: 'Video hajmi 500MB dan oshmasligi kerak' });
+      setErrorModal({ show: true, message: 'Video hajmi 2GB dan oshmasligi kerak' });
       return;
     }
     
@@ -94,7 +94,26 @@ export function AdminDarslar() {
       setUploadProgress(100);
     } catch (err: any) {
       console.error('Upload error:', err);
-      const errorMsg = err.response?.data?.error || err.message || 'Video yuklashda xatolik';
+      
+      // Handle specific error codes
+      let errorMsg = 'Video yuklashda xatolik';
+      
+      if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
+        errorMsg = 'Tarmoq xatosi. Internet aloqangizni tekshiring va qayta urinib ko\'ring.';
+      } else if (err.response?.status === 408) {
+        errorMsg = 'Yuklash vaqti tugadi (408 Timeout). Iltimos qayta urinib ko\'ring. Agar muammo davom etsa, kichikroq video yuklang yoki internet tezligingizni tekshiring.';
+      } else if (err.response?.status === 413) {
+        errorMsg = 'Video hajmi juda katta (413 Payload Too Large). Maksimal hajm: 2GB';
+      } else if (err.response?.status === 499) {
+        errorMsg = 'Yuklash bekor qilindi (499 Client Closed Request). Qayta urinib ko\'ring.';
+      } else if (err.response?.status === 502 || err.response?.status === 504) {
+        errorMsg = 'Server bilan bog\'lanishda xatolik (502/504 Gateway Error). Bir necha daqiqadan so\'ng qayta urinib ko\'ring.';
+      } else if (err.response?.data?.error) {
+        errorMsg = err.response.data.error;
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+      
       setErrorModal({ show: true, message: errorMsg });
     } finally {
       setUploading(false);
@@ -355,7 +374,7 @@ export function AdminDarslar() {
                         <div className="flex flex-col items-center gap-2">
                           <span className="material-symbols-outlined text-4xl text-slate-400">cloud_upload</span>
                           <p className="text-sm text-slate-500">Video yuklash uchun bosing</p>
-                          <p className="text-xs text-slate-400">MP4, WebM, OGG (max 500MB)</p>
+                          <p className="text-xs text-slate-400">MP4, WebM, OGG (max 2GB)</p>
                         </div>
                       )}
                     </button>
