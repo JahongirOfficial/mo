@@ -51,9 +51,9 @@ const upload = multer({
 
 // Upload video (admin only)
 router.post('/video', isAdmin, (req, res, next) => {
-  // Disable timeout completely for video uploads
-  req.setTimeout(0);
-  res.setTimeout(0);
+  // Set timeout to 30 minutes for video uploads
+  req.setTimeout(1800000);
+  res.setTimeout(1800000);
   next();
 }, upload.single('video'), async (req: AuthRequest, res) => {
   try {

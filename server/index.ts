@@ -22,10 +22,10 @@ import { authenticateToken, checkSubscription } from './middleware/auth';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Disable timeout completely for large file uploads
+// Set timeout to 30 minutes for large file uploads
 app.use((req, res, next) => {
-  req.setTimeout(0); // No timeout
-  res.setTimeout(0); // No timeout
+  req.setTimeout(1800000); // 30 minutes
+  res.setTimeout(1800000); // 30 minutes
   next();
 });
 
@@ -210,5 +210,7 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Network: http://0.0.0.0:${PORT}`);
 });
 
-// Disable server timeout completely
-server.setTimeout(0);
+// Set server timeouts for large uploads (30 minutes)
+server.setTimeout(1800000); // 30 minutes
+server.headersTimeout = 1860000; // 31 minutes (must be > setTimeout)
+server.requestTimeout = 1800000; // 30 minutes
